@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import multer from "multer";
 import dotenv from "dotenv";
-import { uploadDocToThread, summarize } from "./documents.js";
+import { uploadDocToThread, summarize, isDocReady } from "./documents.js";
 
 dotenv.config();
 
@@ -31,6 +31,17 @@ app.post("/api/summarize", async (req, res) => {
   try {
     const summary = await summarize();
     res.json({ summary });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// TODO: make endpoint dynamic through req.documentId then pass it to isDocReady
+app.post("/api/checkDocStatus", async (req, res) => {
+  try {
+    const isReady = await isDocReady();
+    res.json({ isReady });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });

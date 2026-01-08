@@ -8,6 +8,7 @@ const client = new BackboardClient({
 });
 let thread = null;
 let assistant = null;
+let docId = null;
 
 export async function uploadDocToThread(buffer, filename) {
   await initBackboard();
@@ -38,23 +39,30 @@ export async function uploadDocToThread(buffer, filename) {
   }
 
   const data = await resp.json();
-  const documentId = data.documentId;
-
-  // Wait for the document to be indexed
-  // console.log("Waiting for document to be indexed...");
-  // while (true) {
-  //   const status = await client.getDocumentStatus(documentId);
-  //   if (status.status === "indexed") {
-  //     console.log("Document indexed successfully!");
-  //     break;
-  //   } else if (status.status === "failed") {
-  //     console.log("Indexing failed:", status.statusMessage);
-  //     return;
-  //   }
-  //   await new Promise((resolve) => setTimeout(resolve, 2000));
-  // }
+  docId = data.documentId;
 
   return resp;
+}
+
+/**
+ * Checks if document has finished uploading to thread or assistant
+ * @returns whether the document is uploaded
+ */
+export async function isDocReady() {
+  if (!docId) {
+    return;
+  }
+
+  const status = await client.getDocumentStatus(documentId);
+  if (status.status === "indexed") {
+    console.log("Document indexed successfully!");
+    return true;
+  } else if (status.status === "failed") {
+    console.log("Indexing failed:", status.statusMessage);
+    throw new Error("Indexing failed:", status.statusMessage);
+  } else {
+    return false;
+  }
 }
 
 export async function summarize() {
