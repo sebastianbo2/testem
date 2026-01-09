@@ -1,0 +1,130 @@
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { Brain, ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { CircularProgress } from '@/components/CircularProgress';
+import { QuestionCard } from '@/components/exam/QuestionCard';
+import { Question } from '@/types/exam';
+import { submitExam } from '@/lib/mockApi';
+
+const Results = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [score, setScore] = useState<number | null>(null);
+  const [totalCorrect, setTotalCorrect] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const questions = location.state?.questions as Question[] | undefined;
+
+  useEffect(() => {
+    if (!questions) {
+      navigate('/');
+      return;
+    }
+
+    const calculateResults = async () => {
+      setIsLoading(true);
+      const result = await submitExam(questions);
+      setScore(result.score);
+      setTotalCorrect(result.totalCorrect);
+      setIsLoading(false);
+    };
+
+    calculateResults();
+  }, [questions, navigate]);
+
+  if (!questions || isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse-subtle text-center">
+          <div className="w-24 h-24 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <Brain className="w-12 h-12 text-primary" />
+          </div>
+          <p className="text-muted-foreground">Calculating results...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Brain className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">Testem</h1>
+              <p className="text-xs text-muted-foreground">Exam Results</p>
+            </div>
+          </Link>
+          <Button variant="outline" asChild className="gap-2">
+            <Link to="/">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Dashboard
+            </Link>
+          </Button>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        {/* Score Overview */}
+        <div className="text-center mb-12">
+          <CircularProgress value={score || 0} size={220} className="mb-6" />
+          
+          <h2 className="text-3xl font-bold text-foreground mb-2">
+            {score !== null && score >= 80
+              ? 'Excellent Work!'
+              : score !== null && score >= 50
+              ? 'Good Effort!'
+              : 'Keep Practicing!'}
+          </h2>
+          
+          <p className="text-muted-foreground mb-6">
+            You answered {totalCorrect} out of {questions.length} questions correctly.
+          </p>
+
+          <div className="flex items-center justify-center gap-6">
+            <div className="flex items-center gap-2 text-success">
+              <CheckCircle className="w-5 h-5" />
+              <span className="font-medium">{totalCorrect} Correct</span>
+            </div>
+            <div className="flex items-center gap-2 text-destructive">
+              <XCircle className="w-5 h-5" />
+              <span className="font-medium">{questions.length - totalCorrect} Incorrect</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Questions Review */}
+        <div className="max-w-3xl mx-auto space-y-6">
+          <h3 className="text-xl font-semibold text-foreground mb-4">Review Your Answers</h3>
+          
+          {questions.map((question, index) => (
+            <QuestionCard
+              key={question.id}
+              question={question}
+              index={index}
+              onAnswerChange={() => {}}
+              showResults
+            />
+          ))}
+
+          <div className="flex justify-center pt-8">
+            <Button asChild size="lg" className="gap-2 px-8">
+              <Link to="/">
+                <ArrowLeft className="w-5 h-5" />
+                Return to Dashboard
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default Results;
