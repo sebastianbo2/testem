@@ -72,7 +72,7 @@ export async function summarize() {
 
   // Ask a question about the document and stream the response
   const stream = await client.addMessage(thread.threadId, {
-    content: "What are the key points in the document?",
+    content: "Generate questions for a practice exam on the documents uploaded. Do not output any extra text, only output the questions, and separate them by the \"`\" symbol: make sure not to use that symbol anywhere else (only separation). These are the parameters for the exam (in order) : Amount of questions, difficulty: ",
     stream: true,
   });
 
@@ -87,6 +87,7 @@ export async function summarize() {
     }
   }
 
+  console.log(result)
   return result;
 }
 
@@ -94,7 +95,7 @@ export async function initBackboard() {
   if (!assistant) {
     assistant = await client.createAssistant({
       name: "Document Assistant",
-      description: "An assistant that can analyze documents",
+      description: "An assistant that can analyze documents and make exams based on those documents: you follow format specifications",
     });
   }
 
