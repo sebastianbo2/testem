@@ -10,6 +10,22 @@ import { mockFolders, mockDocuments } from "@/lib/mockData";
 import { ExamConfig, Document } from "@/types/exam";
 import { Link } from "react-router-dom";
 
+const requestFiles = async (fileIds: string[]) => {
+
+  const params = new URLSearchParams();
+
+  fileIds.forEach(id => params.append("fileIds", id));
+
+  const link = `${import.meta.env.VITE_SERVER_URL}/api/files?${params.toString()}`
+
+  const response = await fetch(link)
+
+  const json = response.json()
+
+  console.log(json)
+  return json
+}
+
 const DocumentManagement = () => {
   const navigate = useNavigate();
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
@@ -78,10 +94,15 @@ const DocumentManagement = () => {
     setIsConfigModalOpen(true);
   };
 
-  const handleStartExam = (config: ExamConfig) => {
+  const handleStartExam = async (config: ExamConfig) => {
     setIsConfigModalOpen(false);
+
+    const examQuestions: string[] = await requestFiles(Array.from(selectedDocIds));
+
+    console.log(examQuestions)
+
     navigate("/exam", {
-      state: { config, selectedDocIds: Array.from(selectedDocIds) },
+      state: { config, questions: examQuestions },
     });
   };
 
