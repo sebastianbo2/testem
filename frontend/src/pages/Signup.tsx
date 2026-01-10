@@ -30,10 +30,7 @@ export default function Signup() {
         const result = await signUpNewUser(email, password);
 
         if (result.success === false) {
-          if (
-            result.error.message.includes("already registered") ||
-            (result.error as any).code === "user_already_exists"
-          ) {
+          if ((result.error as any).code === "user_already_exists") {
             setEmailError(true);
             setEmailErrorMessage(
               "This email is already in use. Try logging in instead."
@@ -42,6 +39,24 @@ export default function Signup() {
             setError(result.error.message);
           }
           return;
+        }
+
+        // create assistant for new signed user ID
+        const userId = result.data.user.id;
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_SERVER_URL}/supabase/createNewAssistant`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ user_id: userId }),
+            }
+          );
+
+          if (!response.ok) throw new Error("Failed to create assistant");
+        } catch (err) {
+          console.error("Backend sync failed:", err);
+          // Logic for retry or cleanup
         }
 
         navigate("/dashboard");

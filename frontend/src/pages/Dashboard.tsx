@@ -54,7 +54,7 @@ const Dashboard = () => {
               <Link to="/history">History</Link>
             </Button>
             <Button onClick={handleLogOut} variant="ghost" asChild>
-              <Link to="/signup">Log out</Link>
+              <Link to="/login">Log out</Link>
             </Button>
           </nav>
         </div>
