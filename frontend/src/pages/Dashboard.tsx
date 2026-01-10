@@ -1,16 +1,41 @@
-import { Link } from 'react-router-dom';
-import { Brain, FolderOpen, History, BookOpen, Clock, TrendingUp } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { mockExamHistory } from '@/lib/mockData';
-import { cn } from '@/lib/utils';
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Brain,
+  FolderOpen,
+  History,
+  BookOpen,
+  Clock,
+  TrendingUp,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { mockExamHistory } from "@/lib/mockData";
+import { cn } from "@/lib/utils";
+import Logo from "@/components/icons/Logo";
+import { useAuth } from "@/context/AuthContext";
 
 const Dashboard = () => {
+  const { logOutUser } = useAuth();
+
+  const handleLogOut = async (e) => {
+    try {
+      await logOutUser();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const getScoreBadgeVariant = (score: number) => {
-    if (score >= 80) return 'bg-success-muted text-success border-success/30';
-    if (score >= 50) return 'bg-warning/10 text-warning border-warning/30';
-    return 'bg-error-muted text-destructive border-destructive/30';
+    if (score >= 80) return "bg-success-muted text-success border-success/30";
+    if (score >= 50) return "bg-warning/10 text-warning border-warning/30";
+    return "bg-error-muted text-destructive border-destructive/30";
   };
 
   return (
@@ -19,13 +44,7 @@ const Dashboard = () => {
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Brain className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-foreground">Testem</h1>
-              <p className="text-xs text-muted-foreground">AI-Powered Exam Generator</p>
-            </div>
+            <Logo />
           </div>
           <nav className="flex items-center gap-2">
             <Button variant="ghost" asChild>
@@ -33,6 +52,9 @@ const Dashboard = () => {
             </Button>
             <Button variant="ghost" asChild>
               <Link to="/history">History</Link>
+            </Button>
+            <Button onClick={handleLogOut} variant="ghost" asChild>
+              <Link to="/signup">Log out</Link>
             </Button>
           </nav>
         </div>
@@ -42,8 +64,13 @@ const Dashboard = () => {
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-foreground mb-2">Welcome back!</h2>
-          <p className="text-muted-foreground">Ready to test your knowledge? Select documents and generate personalized exams.</p>
+          <h2 className="text-3xl font-bold text-foreground mb-2">
+            Welcome back!
+          </h2>
+          <p className="text-muted-foreground">
+            Ready to test your knowledge? Select documents and generate
+            personalized exams.
+          </p>
         </div>
 
         {/* Stats Overview */}
@@ -61,7 +88,7 @@ const Dashboard = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="card-academic">
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
@@ -75,7 +102,7 @@ const Dashboard = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="card-academic">
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
@@ -102,13 +129,16 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <CardTitle>Document Library</CardTitle>
-                  <CardDescription>Upload and manage your study materials</CardDescription>
+                  <CardDescription>
+                    Upload and manage your study materials
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
-                Your documents are organized into folders. Select documents to generate customized exams based on your study materials.
+                Your documents are organized into folders. Select documents to
+                generate customized exams based on your study materials.
               </p>
               <Button asChild className="w-full">
                 <Link to="/documents">
@@ -128,7 +158,9 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <CardTitle>Exam History</CardTitle>
-                  <CardDescription>Review your past exam attempts</CardDescription>
+                  <CardDescription>
+                    Review your past exam attempts
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -147,7 +179,10 @@ const Dashboard = () => {
                     </div>
                     <Badge
                       variant="outline"
-                      className={cn('font-semibold', getScoreBadgeVariant(exam.score))}
+                      className={cn(
+                        "font-semibold",
+                        getScoreBadgeVariant(exam.score)
+                      )}
                     >
                       {exam.score}%
                     </Badge>
