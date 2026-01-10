@@ -39,6 +39,7 @@ export const QuestionCard = ({
             className="space-y-3"
           >
             {question.options?.map((option, optIndex) => (
+              <Label htmlFor={`${index}-${optIndex}`} className="flex-1 cursor-pointer">
               <div
                 key={optIndex}
                 className={cn(
@@ -48,10 +49,9 @@ export const QuestionCard = ({
                 )}
               >
                 <RadioGroupItem value={option} id={`${index}-${optIndex}`} />
-                <Label htmlFor={`${index}-${optIndex}`} className="flex-1 cursor-pointer">
                   <LatexRenderer content={option} />
-                </Label>
               </div>
+              </Label>
             ))}
           </RadioGroup>
         );
