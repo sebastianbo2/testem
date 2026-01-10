@@ -10,6 +10,8 @@ import { mockFolders } from "@/lib/mockData";
 import { ExamConfig, Document } from "@/types/exam";
 import { Link } from "react-router-dom";
 import supabase from "@/config/supabaseClient";
+import { ExamLoadingState } from "@/components/ExamLoadingState";
+import Logo from "@/components/icons/Logo";
 
 const requestFiles = async (fileIds: string[]) => {
   const params = new URLSearchParams();
@@ -36,6 +38,7 @@ const DocumentManagement = () => {
   const [documents, setDocuments] = useState<Document[] | null>([]);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [error, setError] = useState<Error | undefined>(undefined);
+  const [loadingExam, setLoadingExam] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -199,6 +202,7 @@ const DocumentManagement = () => {
 
   const handleStartExam = async (config: ExamConfig) => {
     setIsConfigModalOpen(false);
+    setLoadingExam(true);
 
 
     navigate("/exam", {
@@ -206,20 +210,16 @@ const DocumentManagement = () => {
     });
   };
 
+  if (loadingExam) {
+    return <ExamLoadingState/>
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Brain className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-foreground">Testem</h1>
-              <p className="text-xs text-muted-foreground">Document Library</p>
-            </div>
-          </Link>
+          <Logo/>
           <div className="flex items-center gap-2">
             <Button
               onClick={() => fileInputRef.current.click()}

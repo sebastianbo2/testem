@@ -1,16 +1,12 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Brain } from 'lucide-react';
+import Logo from './icons/Logo';
 
 export const ExamLoadingState = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8">
       <div className="text-center space-y-6 max-w-md">
-        <div className="relative">
-          <div className="w-24 h-24 mx-auto rounded-full bg-primary/10 flex items-center justify-center animate-pulse-subtle">
-            <Brain className="w-12 h-12 text-primary" />
-          </div>
-          <div className="absolute inset-0 w-24 h-24 mx-auto rounded-full border-2 border-primary/30 border-t-primary animate-spin" style={{ animationDuration: '2s' }} />
-        </div>
+        <Logo/>
         
         <div>
           <h2 className="text-2xl font-semibold text-foreground mb-2">Parsing Knowledge...</h2>
