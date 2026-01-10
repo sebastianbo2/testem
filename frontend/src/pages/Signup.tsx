@@ -156,38 +156,6 @@ export default function Signup() {
           </button>
         </form>
 
-        {/* Divider */}
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">or</span>
-          </div>
-        </div>
-
-        {/* Social Buttons */}
-        <div className="flex flex-col gap-3">
-          <button
-            onClick={() => alert("Sign up with Google")}
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-          >
-            <div className="mr-2">
-              <GoogleIcon />
-            </div>
-            Sign up with Google
-          </button>
-          <button
-            onClick={() => alert("Sign up with Facebook")}
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-          >
-            <div className="mr-2">
-              <FacebookIcon />
-            </div>
-            Sign up with Facebook
-          </button>
-        </div>
-
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
           <a
