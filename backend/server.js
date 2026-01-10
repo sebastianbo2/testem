@@ -85,7 +85,7 @@ app.post("/api/answers", express.json(), (req, res) => {
   const { questions } = req.body;
 
   questions.forEach(question => {
-    question.correctAnswer = "Hello world"
+    question.modelAnswer = "$3x^2 + 4x - 5$"
     const randInt = Math.random()
     randInt <= 0.5 ? question.isCorrect = true : question.isCorrect = false
   });

@@ -27,6 +27,8 @@ export const QuestionCard = ({
     return isCorrect ? 'question-correct' : 'question-incorrect';
   };
 
+  console.log(question.modelAnswer)
+
   const renderQuestionContent = () => {
     switch (question.type) {
       case 'multiple-choice':
@@ -43,7 +45,8 @@ export const QuestionCard = ({
                 className={cn(
                   'flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors',
                   showResults && question.userAnswer === option && 'bg-success-muted border-success',
-                  showResults && question.userAnswer === option && !isCorrect && 'bg-error-muted border-destructive'
+                  showResults && question.userAnswer === option && !isCorrect && 'bg-error-muted border-destructive',
+                  showResults && question.userAnswer != option && !isCorrect && option === question.modelAnswer && 'bg-success-muted border-success'
                 )}
               >
                 <RadioGroupItem value={option} id={`${index}-${optIndex}`} key={`${index}-${optIndex}`}/>
