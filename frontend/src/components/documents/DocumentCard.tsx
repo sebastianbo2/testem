@@ -9,7 +9,7 @@ interface DocumentCardProps {
   document: DocumentType;
   isSelected: boolean;
   onSelect: (id: string, selected: boolean) => void;
-  onDelete: (id: string) => void;
+  onDelete: (document: DocumentType) => void;
 }
 
 export const DocumentCard = ({
@@ -59,7 +59,7 @@ export const DocumentCard = ({
         size="icon"
         onClick={(e) => {
           e.stopPropagation();
-          onDelete(document.id);
+          onDelete(document);
         }}
         className="opacity-0 group-hover:opacity-100 hover:opacity-100 hover:bg-destructive/10 hover:text-destructive"
       >

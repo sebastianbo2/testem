@@ -20,13 +20,14 @@ export const QuestionCard = ({
   onAnswerChange,
   showResults = false,
 }: QuestionCardProps) => {
-  // const isCorrect = question.userAnswer?.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim();
-  const isCorrect = false;
+  const isCorrect = question.isCorrect
 
   const getResultClasses = () => {
     if (!showResults) return '';
     return isCorrect ? 'question-correct' : 'question-incorrect';
   };
+
+  console.log(question.modelAnswer)
 
   const renderQuestionContent = () => {
     switch (question.type) {
@@ -39,19 +40,19 @@ export const QuestionCard = ({
             className="space-y-3"
           >
             {question.options?.map((option, optIndex) => (
+              <Label htmlFor={`${index}-${optIndex}`} className="flex-1 cursor-pointer" key={`${index}-${optIndex}`}>
               <div
-                key={optIndex}
                 className={cn(
                   'flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors',
-                  // showResults && option === question.correctAnswer && 'bg-success-muted border-success',
-                  showResults && question.userAnswer === option && !isCorrect && 'bg-error-muted border-destructive'
+                  showResults && question.userAnswer === option && 'bg-success-muted border-success',
+                  showResults && question.userAnswer === option && !isCorrect && 'bg-error-muted border-destructive',
+                  showResults && question.userAnswer != option && !isCorrect && option === question.modelAnswer && 'bg-success-muted border-success'
                 )}
               >
-                <RadioGroupItem value={option} id={`${index}-${optIndex}`} />
-                <Label htmlFor={`${index}-${optIndex}`} className="flex-1 cursor-pointer">
+                <RadioGroupItem value={option} id={`${index}-${optIndex}`} key={`${index}-${optIndex}`}/>
                   <LatexRenderer content={option} />
-                </Label>
               </div>
+              </Label>
             ))}
           </RadioGroup>
         );
@@ -67,7 +68,7 @@ export const QuestionCard = ({
           >
             {['True', 'False'].map((option) => (
               <ToggleGroupItem
-                key={option}
+                key={`${index}-${option}`}
                 value={option}
                 className={cn(
                   'px-8 py-3 border',

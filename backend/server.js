@@ -58,6 +58,43 @@ app.get("/api/files", (req, res) => {
   res.json(sampleQuestions);
 })
 
+const correctedAnswers = [
+  {
+    correct: "yes",
+    modelAnswer: "GENERATED ANSWER",
+  },
+  {
+    correct: "no",
+    modelAnswer: "GENERATED ANSWER",
+  },
+  {
+    correct: "no",
+    modelAnswer: "GENERATED ANSWER",
+  },
+  {
+    correct: "yes",
+    modelAnswer: "GENERATED ANSWER",
+  },
+  {
+    correct: "no",
+    modelAnswer: "GENERATED ANSWER",
+  },
+]
+
+app.post("/api/answers", express.json(), (req, res) => {
+  const { questions } = req.body;
+
+  questions.forEach(question => {
+    question.modelAnswer = "$3x^2 + 4x - 5$"
+    const randInt = Math.random()
+    randInt <= 0.5 ? question.isCorrect = true : question.isCorrect = false
+  });
+
+  console.log(questions.map(question => question.userAnswer))
+
+  res.json(questions);
+})
+
 app.post("/api/upload", upload.single("file"), async (req, res) => {
   try {
     const docId = await uploadDocToThread(

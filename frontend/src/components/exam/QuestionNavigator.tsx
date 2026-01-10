@@ -18,7 +18,7 @@ export const QuestionNavigator = ({
       <div className="grid grid-cols-5 gap-2">
         {questions.map((question, index) => (
           <button
-            key={question.id}
+            key={index}
             onClick={() => onQuestionClick(index)}
             className={cn(
               'nav-dot',

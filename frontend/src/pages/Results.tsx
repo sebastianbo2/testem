@@ -12,9 +12,11 @@ const Results = () => {
   const navigate = useNavigate();
   const [score, setScore] = useState<number | null>(null);
   const [totalCorrect, setTotalCorrect] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const questions = location.state?.questions as Question[] | undefined;
+
+  console.log(questions)
 
   useEffect(() => {
     if (!questions) {
@@ -22,15 +24,15 @@ const Results = () => {
       return;
     }
 
-    const calculateResults = async () => {
-      setIsLoading(true);
-      const result = await submitExam(questions);
-      setScore(result.score);
-      setTotalCorrect(result.totalCorrect);
-      setIsLoading(false);
-    };
+    // const calculateResults = async () => {
+    //   setIsLoading(true);
+    //   const result = await submitExam(questions);
+    //   setScore(result.score);
+    //   setTotalCorrect(result.totalCorrect);
+    //   setIsLoading(false);
+    // };
 
-    calculateResults();
+    // calculateResults();
   }, [questions, navigate]);
 
   if (!questions || isLoading) {
@@ -105,7 +107,7 @@ const Results = () => {
           
           {questions.map((question, index) => (
             <QuestionCard
-              key={question.id}
+              key={index}
               question={question}
               index={index}
               onAnswerChange={() => {}}
