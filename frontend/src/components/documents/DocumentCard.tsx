@@ -47,10 +47,10 @@ export const DocumentCard = ({
 
       <div className="flex-1 min-w-0">
         <h4 className="font-medium text-foreground truncate">
-          {document.name}
+          {document["display_name"]}
         </h4>
         <p className="text-xs text-muted-foreground">
-          {document.size} • {getFormattedDate(document.uploadedAt)}
+          {document.size} • {getFormattedDate(document["created_at"])}
         </p>
       </div>
 
