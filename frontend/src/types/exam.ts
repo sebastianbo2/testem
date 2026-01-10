@@ -28,6 +28,7 @@ export interface Exam {
 
 export interface Document {
   id: string;
+  user_id: string;
   display_name: string;
   storage_path: string
   status: string;

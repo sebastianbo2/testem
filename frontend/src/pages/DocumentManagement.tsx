@@ -1,4 +1,11 @@
-import { useState, useRef, useEffect, ChangeEvent, Suspense } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  ChangeEvent,
+  Suspense,
+  useContext,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { Brain, Upload, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +20,7 @@ import { ExamLoadingState } from "@/components/ExamLoadingState";
 import Logo from "@/components/icons/Logo";
 import DeleteFolderBanner from "@/components/folders/DeleteFolderBanner";
 import CreateFolderBanner from "@/components/folders/CreateFolderBanner";
+import { useAuth } from "@/context/AuthContext";
 
 const requestFiles = async (fileIds: string[]) => {
   const params = new URLSearchParams();
@@ -38,13 +46,15 @@ const DocumentManagement = () => {
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [documents, setDocuments] = useState<Document[] | null>([]);
   const [folders, setFolders] = useState<Folder[] | null>([]);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [error, setError] = useState<Error | undefined>(undefined);
   const [loadingExam, setLoadingExam] = useState(false);
   const [deleteBannerOpen, setDeleteBannerOpen] = useState(false);
   const [createBannerOpen, setCreateBannerOpen] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>("");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const { session } = useAuth();
 
   const filteredDocuments = selectedFolderId
     ? documents.filter((doc) => doc["folder_id"] === selectedFolderId)
@@ -52,10 +62,16 @@ const DocumentManagement = () => {
 
   // initialize documents to pull from database
   useEffect(() => {
-    async function loadDocumentsFromDB() {
-      // TODO: filter by user_id and folder
+    // TODO: loading data page
 
-      const { data, error } = await supabase.from("documents").select();
+    const userId = session.user.id;
+    setCurrentUserId(userId);
+
+    async function loadDocumentsFromDB() {
+      const { data, error } = await supabase
+        .from("documents")
+        .select()
+        .eq("user_id", userId);
 
       if (error) {
         setError(error);
@@ -65,79 +81,93 @@ const DocumentManagement = () => {
         setDocuments(data);
       }
     }
-
     loadDocumentsFromDB();
-  }, []);
+
+    async function loadFoldersFromDB() {
+      const { data, error } = await supabase
+        .from("folders")
+        .select()
+        .eq("user_id", userId);
+
+      if (error) {
+        setError(error);
+        return;
+      }
+      if (data) {
+        setFolders(data);
+      }
+    }
+    loadFoldersFromDB();
+  }, [session]);
 
   // DOCUMENT UPLOADING
-  useEffect(() => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    const file = e.target.files[0];
+
+    // clear the input immediately so they can select the same file again if needed
+    e.target.value = "";
+
+    await uploadFileToDB(file);
+  };
+
+  const uploadFileToDB = async (uploadedFile: File) => {
     if (uploadedFile) {
-      const uploadToDB = async () => {
-        try {
-          // SUPABASE
+      try {
+        // SUPABASE
 
-          // unique path to avoid collisions
-          // TODO: {user_id}/{unique_file_id}/{original_filename} when auth is done
-          const docId = crypto.randomUUID();
-          const fileExt = uploadedFile.name.split(".").pop();
-          const uniqueFileName = `${docId}.${fileExt}`;
-          const storagePath = `${selectedFolderId ?? ""}/${uniqueFileName}`;
+        // unique path to avoid collisions
+        const docId = crypto.randomUUID();
+        const fileExt = uploadedFile.name.split(".").pop();
+        const uniqueFileName = `${docId}.${fileExt}`;
+        const storagePath = `${currentUserId}/${uploadedFile.name}__${uniqueFileName}`;
 
-          // upload "uploadedFile" to supabase "documents" bucket
-          const { data: storageData, error: storageError } =
-            await supabase.storage
-              .from("documents")
-              .upload(storagePath, uploadedFile);
-
-          if (storageError) {
-            setError(storageError);
-          }
-
-          // create the record in the 'documents' table
-          const { data: dbData, error: dbError } = await supabase
+        // upload "uploadedFile" to supabase "documents" bucket
+        const { data: storageData, error: storageError } =
+          await supabase.storage
             .from("documents")
-            .insert([
-              {
-                id: docId,
-                display_name: uploadedFile.name,
-                storage_path: storagePath,
-                status: "pending", // default value
-                folder_id: selectedFolderId,
-                size: uploadedFile.size,
-                type: uploadedFile.type,
-              },
-            ])
-            .select(); // Returns the new row, including the generated ID
+            .upload(storagePath, uploadedFile);
 
-          if (dbError) {
-            setError(dbError);
-            return;
-          }
-          if (dbData) {
-            console.log("Document ready for processing:", dbData[0]);
-            // STATE (FRONTEND)
-            setDocuments([...documents, dbData[0]]);
-          }
-        } catch (err) {
-          setError(err);
+        if (storageError) {
+          setError(storageError);
         }
-      };
 
-      uploadToDB();
+        // create the record in the 'documents' table
+        const { data: dbData, error: dbError } = await supabase
+          .from("documents")
+          .insert([
+            {
+              id: docId,
+              user_id: currentUserId,
+              display_name: uploadedFile.name,
+              storage_path: storagePath,
+              status: "pending", // default value
+              folder_id: selectedFolderId,
+              size: uploadedFile.size,
+              type: uploadedFile.type,
+            },
+          ])
+          .select(); // Returns the new row, including the generated ID
+
+        if (dbError) {
+          setError(dbError);
+          return;
+        }
+        if (dbData) {
+          console.log("Document ready for processing:", dbData[0]);
+          // STATE (FRONTEND)
+          setDocuments([...documents, dbData[0]]);
+        }
+      } catch (err) {
+        setError(err);
+      }
     }
-  }, [uploadedFile]);
+  };
 
-  // TODO: better error handling, possibly with Banner.tsx
+  // TODO: better error handling, possibly with BannerWrapper.tsx
   useEffect(() => {
     console.error("An error occured: ", error);
   }, [error]);
-
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setUploadedFile(e.target.files[0]);
-      e.target.value = "";
-    }
-  };
 
   const handleDocumentSelect = (id: string, selected: boolean) => {
     const newSelected = new Set(selectedDocIds);
@@ -155,9 +185,6 @@ const DocumentManagement = () => {
     const newSelected = new Set(selectedDocIds);
     newSelected.delete(id);
     setSelectedDocIds(newSelected);
-
-    // allow user to reupload same file
-    setUploadedFile(null);
 
     // Delete from supabase
     const deleteFromDB = async () => {
@@ -223,9 +250,8 @@ const DocumentManagement = () => {
     setSelectedFolderId(null);
 
     // 1. Identify which documents belong to this folder
-    // We check if the storage_path contains the folder ID (or name)
-    const filesInFolder = documents.filter((doc) =>
-      doc.storage_path.includes(selectedFolderId)
+    const filesInFolder = documents.filter(
+      (doc) => doc.folder_id === selectedFolderId
     );
 
     // 2. Perform the bulk delete for the files
@@ -258,7 +284,6 @@ const DocumentManagement = () => {
     const newSelected = new Set(selectedDocIds);
     idsToRemove.forEach((id) => newSelected.delete(id));
     setSelectedDocIds(newSelected);
-    setUploadedFile(null);
 
     try {
       // 2. Bulk Delete from Supabase Storage
@@ -292,10 +317,11 @@ const DocumentManagement = () => {
   };
 
   const handleCreateFolder = async (name: string) => {
+    console.log(currentUserId);
+    console.log(session);
     const { data, error } = await supabase
       .from("folders")
-      // TODO : .insert([{ name, user_id: currentUserId }])
-      .insert([{ name }])
+      .insert([{ name, user_id: currentUserId }])
       .select()
       .single();
 
