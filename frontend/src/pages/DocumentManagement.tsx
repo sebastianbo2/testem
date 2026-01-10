@@ -6,7 +6,7 @@ import { FolderSidebar } from "@/components/documents/FolderSidebar";
 import { DocumentCard } from "@/components/documents/DocumentCard";
 import { FloatingActionBar } from "@/components/documents/FloatingActionBar";
 import { ExamConfigModal } from "@/components/ExamConfigModal";
-import { mockFolders, mockDocuments } from "@/lib/mockData";
+import { mockFolders } from "@/lib/mockData";
 import { ExamConfig, Document } from "@/types/exam";
 import { Link } from "react-router-dom";
 import supabase from "@/config/supabaseClient";
@@ -100,19 +100,19 @@ const DocumentManagement = () => {
 
           if (dbError) {
             setError(dbError);
+            return;
           }
-
-          console.log("Document ready for processing:", dbData[0]);
-          // STATE (FRONTEND)
-          const newDoc: Document = {
-            id: crypto.randomUUID(),
-            name: uploadedFile.name,
-            type: "pdf",
-            folderId: "folder-1",
-            size: "1.3MB",
-            uploadedAt: dbData[0]["created_at"],
-          };
-          setDocuments([...documents, newDoc]);
+          if (dbData) {
+            console.log("Document ready for processing:", dbData[0]);
+            // STATE (FRONTEND)
+            const newDoc: Document = {
+              ...dbData[0],
+              type: "pdf",
+              folderId: "folder-1",
+              size: "1.3MB",
+            };
+            setDocuments([...documents, newDoc]);
+          }
         } catch (err) {
           setError(err);
         }
@@ -144,7 +144,8 @@ const DocumentManagement = () => {
     setSelectedDocIds(newSelected);
   };
 
-  const handleDeleteDocument = (id: string) => {
+  const handleDeleteDocument = (document: Document) => {
+    const id = document.id;
     setDocuments(documents.filter((doc) => doc.id !== id));
     const newSelected = new Set(selectedDocIds);
     newSelected.delete(id);
@@ -152,6 +153,37 @@ const DocumentManagement = () => {
 
     // allow user to reupload same file
     setUploadedFile(null);
+
+    // Delete from supabase
+    const deleteFromDB = async () => {
+      try {
+        // 1. Delete the physical file from the Storage Bucket
+        const { data: storageData, error: storageError } =
+          await supabase.storage
+            .from("documents_bucket")
+            .remove([document.storagePath]); // .remove() expects an array of paths
+
+        if (storageError) {
+          console.error("Storage deletion failed:", storageError.message);
+          return;
+        }
+
+        // 2. Delete the metadata record from the 'documents' table
+        const { error: dbError } = await supabase
+          .from("documents")
+          .delete()
+          .eq("id", id); // Use the UUID to target the specific row
+
+        if (dbError) {
+          throw dbError;
+        }
+
+        console.log("Document and file deleted successfully");
+      } catch (err) {
+        console.error("Deletion process failed:", err.message);
+      }
+    };
+    deleteFromDB();
   };
 
   const handleClearSelection = () => {

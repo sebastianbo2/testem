@@ -7,16 +7,16 @@ export const mockFolders: Folder[] = [
   { id: 'folder-4', name: 'Chemistry' },
 ];
 
-export const mockDocuments: Document[] = [
-  { id: 'doc-1', name: 'Integration Techniques.pdf', type: 'pdf', folderId: 'folder-1', size: '2.4 MB', uploadedAt: '2024-01-15'},
-  { id: 'doc-2', name: 'Differential Equations.pdf', type: 'pdf', folderId: 'folder-1', size: '3.1 MB', uploadedAt: '2024-01-18'},
-  { id: 'doc-3', name: 'Limits and Continuity.txt', type: 'txt', folderId: 'folder-1', size: '156 KB', uploadedAt: '2024-01-20'},
-  { id: 'doc-4', name: 'Matrix Operations.pdf', type: 'pdf', folderId: 'folder-2', size: '1.8 MB', uploadedAt: '2024-01-22'},
-  { id: 'doc-5', name: 'Eigenvalues and Eigenvectors.pdf', type: 'pdf', folderId: 'folder-2', size: '2.2 MB', uploadedAt: '2024-01-25'},
-  { id: 'doc-6', name: 'Mechanics Fundamentals.pdf', type: 'pdf', folderId: 'folder-3', size: '4.5 MB', uploadedAt: '2024-02-01'},
-  { id: 'doc-7', name: 'Thermodynamics.txt', type: 'txt', folderId: 'folder-3', size: '890 KB', uploadedAt: '2024-02-05'},
-  { id: 'doc-8', name: 'Organic Chemistry Basics.pdf', type: 'pdf', folderId: 'folder-4', size: '5.2 MB', uploadedAt: '2024-02-10'},
-];
+// export const mockDocuments: Document[] = [
+//   { id: 'doc-1', name: 'Integration Techniques.pdf', type: 'pdf', folderId: 'folder-1', size: '2.4 MB', uploadedAt: '2024-01-15'},
+//   { id: 'doc-2', name: 'Differential Equations.pdf', type: 'pdf', folderId: 'folder-1', size: '3.1 MB', uploadedAt: '2024-01-18'},
+//   { id: 'doc-3', name: 'Limits and Continuity.txt', type: 'txt', folderId: 'folder-1', size: '156 KB', uploadedAt: '2024-01-20'},
+//   { id: 'doc-4', name: 'Matrix Operations.pdf', type: 'pdf', folderId: 'folder-2', size: '1.8 MB', uploadedAt: '2024-01-22'},
+//   { id: 'doc-5', name: 'Eigenvalues and Eigenvectors.pdf', type: 'pdf', folderId: 'folder-2', size: '2.2 MB', uploadedAt: '2024-01-25'},
+//   { id: 'doc-6', name: 'Mechanics Fundamentals.pdf', type: 'pdf', folderId: 'folder-3', size: '4.5 MB', uploadedAt: '2024-02-01'},
+//   { id: 'doc-7', name: 'Thermodynamics.txt', type: 'txt', folderId: 'folder-3', size: '890 KB', uploadedAt: '2024-02-05'},
+//   { id: 'doc-8', name: 'Organic Chemistry Basics.pdf', type: 'pdf', folderId: 'folder-4', size: '5.2 MB', uploadedAt: '2024-02-10'},
+// ];
 
 export const mockExamHistory: ExamHistoryItem[] = [
   { id: 'exam-1', title: 'Calculus Midterm Prep', subject: 'Calculus', score: 85, totalQuestions: 20, completedAt: new Date('2024-02-15') },
