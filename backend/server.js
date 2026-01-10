@@ -24,9 +24,9 @@ const sampleQuestions = [
   },
   {
     question: `
-$$
+\\[
 \\int_0^1 x^2 dx = \\frac{1}{3}
-$$
+\\]
 `,
     type: "true-false",
     options: ["True", "False"],
