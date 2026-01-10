@@ -16,6 +16,8 @@ const Results = () => {
 
   const questions = location.state?.questions as Question[] | undefined;
 
+  console.log(questions)
+
   useEffect(() => {
     if (!questions) {
       navigate('/');

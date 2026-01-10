@@ -20,8 +20,7 @@ export const QuestionCard = ({
   onAnswerChange,
   showResults = false,
 }: QuestionCardProps) => {
-  // const isCorrect = question.userAnswer?.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim();
-  const isCorrect = false;
+  const isCorrect = question.isCorrect
 
   const getResultClasses = () => {
     if (!showResults) return '';
@@ -43,7 +42,7 @@ export const QuestionCard = ({
               <div
                 className={cn(
                   'flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors',
-                  // showResults && option === question.correctAnswer && 'bg-success-muted border-success',
+                  showResults && question.userAnswer === option && 'bg-success-muted border-success',
                   showResults && question.userAnswer === option && !isCorrect && 'bg-error-muted border-destructive'
                 )}
               >

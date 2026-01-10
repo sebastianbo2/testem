@@ -6,8 +6,8 @@ export interface Question {
   type: QuestionType;
   options?: string[];
   userAnswer?: string;
-  correctAnswer?: string;
-  isLatex: boolean;
+  modelAnswer?: string;
+  isCorrect: boolean;
 }
 
 export interface ExamConfig {
