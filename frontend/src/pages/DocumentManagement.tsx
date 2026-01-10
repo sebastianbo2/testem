@@ -33,7 +33,7 @@ const DocumentManagement = () => {
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [selectedDocIds, setSelectedDocIds] = useState<Set<string>>(new Set());
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
-  const [documents, setDocuments] = useState(mockDocuments);
+  const [documents, setDocuments] = useState<Document[] | null>([]);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
@@ -42,6 +42,25 @@ const DocumentManagement = () => {
   const filteredDocuments = selectedFolderId
     ? documents.filter((doc) => doc.folderId === selectedFolderId)
     : documents;
+
+  // initialize documents to pull from database
+  useEffect(() => {
+    async function loadDocumentsFromDB() {
+      // TODO: filter by user_id and folder
+
+      const { data, error } = await supabase.from("documents").select();
+
+      if (error) {
+        setError(error);
+        return;
+      }
+      if (data) {
+        setDocuments(data);
+      }
+    }
+
+    loadDocumentsFromDB();
+  }, []);
 
   // DOCUMENT UPLOADING
   useEffect(() => {
