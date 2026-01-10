@@ -15,8 +15,7 @@ type UploadStatus = "idle" | "uploading" | "indexing" | "success" | "error";
 const ActiveExam = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [status, setStatus] = useState<UploadStatus>("idle");
@@ -25,7 +24,7 @@ const ActiveExam = () => {
 
   const examQuestions = location.state?.questions as Question[]
 
-  console.log(examQuestions)
+  const [questions, setQuestions] = useState<Question[]>(examQuestions);
 
   useEffect(() => {
     if (!config) {
@@ -33,21 +32,24 @@ const ActiveExam = () => {
       return;
     }
 
-    const loadExam = async () => {
-      setIsLoading(true);
-      const examQuestions = await generateExam(config);
-      setQuestions(examQuestions);
-      setIsLoading(false);
-    };
+    // const loadExam = async () => {
+    //   setIsLoading(true);
+    //   const examQuestions = await generateExam(config);
+    //   setQuestions(examQuestions);
+    //   setIsLoading(false);
+    // };
 
-    loadExam();
+    // loadExam();
   }, [config, navigate]);
 
   const handleAnswerChange = (questionId: number, answer: string) => {
     setQuestions((prev) =>
-      prev.map((q, idx) =>
-        idx === questionId ? { ...q, userAnswer: answer } : q
-      )
+      prev.map((q, idx) => {
+        if (idx === questionId) {
+          q.userAnswer = answer
+        }
+        return q
+      })
     );
   };
 
