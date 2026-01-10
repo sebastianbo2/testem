@@ -32,9 +32,9 @@ export interface Document {
   storage_path: string
   status: string;
   created_at: string;
-  type?: 'pdf' | 'txt';
-  folderId?: string;
-  size?: string;
+  folder_id: string;
+  size: number;
+  type: string;
 }
 
 export interface Folder {

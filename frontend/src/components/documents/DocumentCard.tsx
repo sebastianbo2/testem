@@ -4,6 +4,7 @@ import { FileText, File, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import getFormattedDate from "@/utils/getFormattedDate";
+import { formatBytes } from "@/utils/formatBytes";
 
 interface DocumentCardProps {
   document: DocumentType;
@@ -18,7 +19,7 @@ export const DocumentCard = ({
   onSelect,
   onDelete,
 }: DocumentCardProps) => {
-  const Icon = document.type === "pdf" ? FileText : File;
+  const Icon = document.type === "application/pdf" ? FileText : File;
 
   return (
     <div
@@ -37,7 +38,7 @@ export const DocumentCard = ({
       <div
         className={cn(
           "w-10 h-10 rounded-lg flex items-center justify-center",
-          document.type === "pdf"
+          document.type === "application/pdf"
             ? "bg-destructive/10 text-destructive"
             : "bg-primary/10 text-primary"
         )}
@@ -50,7 +51,8 @@ export const DocumentCard = ({
           {document["display_name"]}
         </h4>
         <p className="text-xs text-muted-foreground">
-          {document.size} • {getFormattedDate(document["created_at"])}
+          {formatBytes(document.size)} •{" "}
+          {getFormattedDate(document["created_at"])}
         </p>
       </div>
 

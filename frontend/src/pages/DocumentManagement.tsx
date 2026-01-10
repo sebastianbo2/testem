@@ -43,7 +43,7 @@ const DocumentManagement = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const filteredDocuments = selectedFolderId
-    ? documents.filter((doc) => doc.folderId === selectedFolderId)
+    ? documents.filter((doc) => doc["folder_id"] === selectedFolderId)
     : documents;
 
   // initialize documents to pull from database
@@ -97,6 +97,9 @@ const DocumentManagement = () => {
                 display_name: uploadedFile.name,
                 storage_path: storagePath,
                 status: "pending", // default value
+                folder_id: selectedFolderId,
+                size: uploadedFile.size,
+                type: uploadedFile.type,
               },
             ])
             .select(); // Returns the new row, including the generated ID
@@ -108,13 +111,7 @@ const DocumentManagement = () => {
           if (dbData) {
             console.log("Document ready for processing:", dbData[0]);
             // STATE (FRONTEND)
-            const newDoc: Document = {
-              ...dbData[0],
-              type: "pdf",
-              folderId: "folder-1",
-              size: "1.3MB",
-            };
-            setDocuments([...documents, newDoc]);
+            setDocuments([...documents, dbData[0]]);
           }
         } catch (err) {
           setError(err);
@@ -204,14 +201,16 @@ const DocumentManagement = () => {
     setIsConfigModalOpen(false);
     setLoadingExam(true);
 
-
     navigate("/exam", {
-      state: { config, questions: await requestFiles(Array.from(selectedDocIds)) },
+      state: {
+        config,
+        questions: await requestFiles(Array.from(selectedDocIds)),
+      },
     });
   };
 
   if (loadingExam) {
-    return <ExamLoadingState/>
+    return <ExamLoadingState />;
   }
 
   return (
@@ -219,7 +218,7 @@ const DocumentManagement = () => {
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Logo/>
+          <Logo />
           <div className="flex items-center gap-2">
             <Button
               onClick={() => fileInputRef.current.click()}
@@ -266,7 +265,6 @@ const DocumentManagement = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pb-24">
-            
             {filteredDocuments.map((doc) => (
               <div key={doc.id} className="group">
                 <DocumentCard
