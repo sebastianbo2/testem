@@ -8,6 +8,9 @@ import DocumentManagement from "./pages/DocumentManagement";
 import ActiveExam from "./pages/ActiveExam";
 import Results from "./pages/Results";
 import NotFound from "./pages/NotFound";
+import Onboarding from "./pages/Onboarding";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 const queryClient = new QueryClient();
 
@@ -18,7 +21,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<Onboarding />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/documents" element={<DocumentManagement />} />
           <Route path="/exam" element={<ActiveExam />} />
           <Route path="/results" element={<Results />} />
