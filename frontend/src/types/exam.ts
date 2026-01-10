@@ -29,7 +29,7 @@ export interface Document {
   type: 'pdf' | 'txt';
   folderId: string;
   size: string;
-  uploadedAt: Date;
+  uploadedAt: string;
 }
 
 export interface Folder {
