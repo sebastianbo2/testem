@@ -38,7 +38,7 @@ const sampleQuestions = [
     options: ['Addition', 'Scalar multiplication', 'Matrix multiplication', 'Transpose'],
   },
   {
-    question: 'Explain the concept of six sevens and provide the formula for finding them for a 2×2 matrix.',
+    question: 'Explain the concept of eigenvalues and provide the formula for finding them for a 2×2 matrix.',
     type: "long-answer",
     options: [],
   }
@@ -53,9 +53,12 @@ app.get("/api/files", (req, res) => {
   ? [fileIds]
   : [];
 
-  setTimeout(() => res.json(sampleQuestions), 3000)
+  setTimeout(() => {
+    res.json(sampleQuestions)
+    console.log("Timer ended")
+}, 3000)
 
-  console.log(ids)
+  console.log("print: ", ids)
 
   // res.json(sampleQuestions);
 })
