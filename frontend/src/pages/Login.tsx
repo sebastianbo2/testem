@@ -1,22 +1,55 @@
 import { useState } from "react";
 import { GoogleIcon, FacebookIcon } from "@/components/icons/CustomIcons";
 import Logo from "@/components/icons/Logo";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  // Errors
+  const [error, setError] = useState(null);
   const [emailError, setEmailError] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
-  const [open, setOpen] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const { logInUser } = useAuth();
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (validateInputs()) {
-      const data = new FormData(event.currentTarget);
-      console.log({
-        email: data.get("email"),
-        password: data.get("password"),
-      });
+      const formData = new FormData(event.currentTarget);
+
+      const email = (formData.get("email") as string).trim();
+      const password = formData.get("password") as string;
+
+      try {
+        const result = await logInUser(email, password);
+
+        if (result.success === false) {
+          if (
+            result.error.message.includes("already registered") ||
+            (result.error as any).code === "user_already_exists"
+          ) {
+            setEmailError(true);
+            setEmailErrorMessage(
+              "This email is already in use. Try logging in instead."
+            );
+          } else {
+            setError(result.error.message);
+          }
+          return;
+        }
+
+        navigate("/dashboard");
+      } catch (err) {
+        setError("an error occured");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -111,22 +144,6 @@ export default function Login() {
                 {passwordErrorMessage}
               </p>
             )}
-          </div>
-
-          {/* Remember Me */}
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="remember"
-              value="remember"
-              className="h-4 w-4 rounded border-primary text-primary focus:ring-primary"
-            />
-            <label
-              htmlFor="remember"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Remember me
-            </label>
           </div>
 
           <button
