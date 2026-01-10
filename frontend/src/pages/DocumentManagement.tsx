@@ -158,13 +158,15 @@ const DocumentManagement = () => {
     const deleteFromDB = async () => {
       try {
         // 1. Delete the physical file from the Storage Bucket
+        console.log(document.storage_path);
         const { data: storageData, error: storageError } =
           await supabase.storage
-            .from("documents_bucket")
-            .remove([document.storagePath]); // .remove() expects an array of paths
+            .from("documents")
+            .remove([document.storage_path]); // .remove() expects an array of paths
 
         if (storageError) {
           console.error("Storage deletion failed:", storageError.message);
+          setError(error);
           return;
         }
 
@@ -175,7 +177,8 @@ const DocumentManagement = () => {
           .eq("id", id); // Use the UUID to target the specific row
 
         if (dbError) {
-          throw dbError;
+          setError(error);
+          return;
         }
 
         console.log("Document and file deleted successfully");
