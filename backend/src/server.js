@@ -119,11 +119,11 @@ app.post("/api/answers", express.json(), async (req, res) => {
 
   console.log("The user who did this exam is", user_id)
 
-  const mockOutput = await readFile("answered.txt", "utf8")
+  const output = await readFile("answered.txt", "utf8")
 
-  // const answeredQuestions = await fetchAnswers(questions, user_id);
+  // const output = await fetchAnswers(questions, user_id); // uncomment this
 
-  const lines = mockOutput.split(/\r?\n/);
+  const lines = output.split(/\r?\n/);
 
   lines.forEach((line, index) => {
     const params = line.split("~")

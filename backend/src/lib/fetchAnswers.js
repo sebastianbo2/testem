@@ -148,5 +148,5 @@ export default async (questions, user_id) => {
   });
 
   // TODO: actually return the questions
-  return questions;
+  return output;
 };
