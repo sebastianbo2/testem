@@ -6,6 +6,7 @@ import { getRowByIdFromTable } from "./lib/db_requests.js";
 import supabase from "./config/supabaseClient.js";
 import fetchQuestions from "./lib/fetchQuestions.js";
 import { readFile } from "fs/promises";
+import fetchAnswers from "./lib/fetchAnswers.js";
 
 const app = express();
 const upload = multer();
@@ -113,16 +114,23 @@ app.post("/api/files", async (req, res) => {
   res.json(questions);
 });
 
-app.post("/api/answers", express.json(), (req, res) => {
+app.post("/api/answers", express.json(), async (req, res) => {
   const { user_id, questions } = req.body;
 
-  questions.forEach((question) => {
-    question.modelAnswer = "$3x^2 + 4x - 5$";
-    const randInt = Math.random();
-    randInt <= 0.5 ? (question.isCorrect = true) : (question.isCorrect = false);
-  });
-
   console.log("The user who did this exam is", user_id)
+
+  const mockOutput = await readFile("answered.txt", "utf8")
+
+  // const answeredQuestions = await fetchAnswers(questions, user_id);
+
+  const lines = mockOutput.split(/\r?\n/);
+
+  lines.forEach((line, index) => {
+    const params = line.split("~")
+
+    questions[index].isCorrect = params[0].toLowerCase().trim() === "yes" ? true : false
+    questions[index].modelAnswer = params[1].trim()
+  })
 
   console.log(questions.map((question) => question.userAnswer));
 
