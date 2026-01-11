@@ -74,7 +74,7 @@ export default async (ids) => {
     llm_provider: 'openai',
     model_name: 'gpt-4o',
     stream: true,
-    web_search: 'Auto'
+    // web_search: 'Auto'
   });
 
   let output = ""
@@ -89,7 +89,24 @@ export default async (ids) => {
     }
   }
 
-  console.log(output)
+  const lines = output.split(/\r?\n/);
+  let questions = []
+
+  lines.forEach((line) => {
+    const params = line.split("~")
+
+    console.log("PARAMS: ", params)
+
+    const question = {
+      question: params[0],
+      type: params[1],
+      options: params[1] === "multiple-choice" ? params[2].split(", ") : [],
+      correctAnswer: params[3]
+    }
+
+    questions.push(question)
+  })
+  
 
   // msgFormData.append('content', prompt)
   // msgFormData.append('llm_provider', '')
@@ -123,5 +140,5 @@ export default async (ids) => {
   });
 
   // TODO: actually return the questions
-  return uploadedDocIds;
+  return questions;
 };

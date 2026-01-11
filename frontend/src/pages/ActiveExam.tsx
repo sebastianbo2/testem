@@ -80,7 +80,7 @@ const ActiveExam = () => {
     return <ExamLoadingState />;
   }
 
-  console.log(questions)
+  console.log("QUESTIONS: ", questions)
 
   const answeredCount = questions.filter((q) => q.userAnswer).length;
 
