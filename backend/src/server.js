@@ -119,7 +119,7 @@ app.post("/api/answers", express.json(), async (req, res) => {
 
   console.log("The user who did this exam is", user_id)
 
-  const output = await readFile("answered.txt", "utf8")
+  const output = await readFile("answered.txt", "utf8") // comment this
 
   // const output = await fetchAnswers(questions, user_id); // uncomment this
 
