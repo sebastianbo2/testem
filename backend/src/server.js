@@ -1,18 +1,10 @@
 import express from "express";
 import cors from "cors";
 import multer from "multer";
-import dotenv from "dotenv";
-import {
-  uploadDocToThread,
-  summarize,
-  isDocReady,
-} from "./documents/documentsOld.js";
-import { createNewAssistant } from "./backboard/createNewAssistant.js";
+import { createNewAssistant } from "./backboard/assistant.js";
 import { getRowByIdFromTable } from "./lib/db_requests.js";
 import supabase from "./config/supabaseClient.js";
 import fetchQuestions from "./lib/fetchQuestions.js";
-
-dotenv.config();
 
 const app = express();
 const upload = multer();
@@ -113,15 +105,15 @@ app.post("/api/answers", express.json(), (req, res) => {
 });
 
 // TODO: make endpoint dynamic through req.documentId then pass it to isDocReady
-app.get("/api/checkDocStatus", async (req, res) => {
-  try {
-    const isReady = await isDocReady();
-    res.json({ isReady });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
+// app.get("/api/checkDocStatus", async (req, res) => {
+//   try {
+//     const isReady = await isDocReady();
+//     res.json({ isReady });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 app.listen(process.env.PORT || 8000, () => {
   console.log("Server is listening");

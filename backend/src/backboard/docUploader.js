@@ -1,17 +1,18 @@
 /**
  * Uploads a single file to backboard API
- * @param {Blob} blob
- * @param {*} fileMetadata
+ * @param {File} file - The File object (which contains the name and type)
  * @param {string} threadId
- * @returns the backboard generated doc id
+ * @returns {Promise<string|null>} the backboard generated doc id
  */
-export const uploadSingleFile = async (blob, fileMetadata, threadId) => {
-  if (!blob) return null;
+export const uploadSingleFileToBackboard = async (file, threadId) => {
+  if (!file) return null;
 
   const formData = new FormData();
-  // IMPORTANT: Use the real filename so Backboard knows it's a PDF
-  const filename = fileMetadata.display_name || "document.pdf";
-  formData.append("file", blob, filename);
+
+  // Since 'file' is a File object, FormData automatically detects
+  // and uses file.name. We don't need to manually pass the filename string
+  // unless we want to override it.
+  formData.append("file", file);
 
   const response = await fetch(
     `${process.env.BACKBOARD_URL}/threads/${threadId}/documents`,
@@ -23,12 +24,12 @@ export const uploadSingleFile = async (blob, fileMetadata, threadId) => {
   );
 
   if (!response.ok) {
-    console.error(`Upload failed for ${filename}`);
+    console.error(`Upload failed for ${file.name}`);
     return null;
   }
 
   const json = await response.json();
-  console.log(`✅ Uploaded: ${filename} -> ID: ${json.document_id}`);
+  console.log(`✅ Uploaded: ${file.name} -> ID: ${json.document_id}`);
   return json.document_id;
 };
 

@@ -1,39 +1,23 @@
-import { getFilesFromDB } from "./db_requests.js";
+import { getFilesFromDB, downloadFilesFromDB } from "./db_requests.js";
 import supabase from "../config/supabaseClient.js";
-import { downloadFilesFromDB } from "../documents/downloadFilesFromDB.js";
 import {
   isDocumentIndexed,
-  uploadSingleFile,
-} from "../documents/docUploader.js";
+  uploadSingleFileToBackboard,
+} from "../backboard/docUploader.js";
+import { getUserAssistant } from "../backboard/assistant.js";
 
 export default async (ids) => {
   const fileRows = await getFilesFromDB(ids); // simple array containing document data
   const files = await downloadFilesFromDB(fileRows); // actual File object
 
-  const user = fileRows[0].user_id;
-
-  console.log("USER: ", user);
+  const user_id = fileRows[0].user_id;
+  console.log("USER: ", user_id);
 
   const backboardURL = `https://app.backboard.io/api`;
 
   // ASSISTANT
-  const assistantSearch = await supabase
-    .from("assistants")
-    .select("*")
-    .eq("user_id", user)
-    .maybeSingle();
-
-  const assistantId = assistantSearch.data.id;
-
-  const response = await fetch(`${backboardURL}/assistants`, {
-    headers: {
-      "X-API-KEY": `${process.env.BACKBOARD_KEY}`,
-    },
-  });
-
-  const assistants = await response.json();
-
-  console.log("We currently have this many assistants: ", assistants.length);
+  const assistant = await getUserAssistant(user_id);
+  const assistantId = assistant.data.id;
 
   // THREAD CREATION
   const thread_res = await fetch(
@@ -55,8 +39,8 @@ export default async (ids) => {
 
   // DOCUMENTS
   console.log("🚀 Starting Uploads...");
-  const uploadPromises = files.map((file, index) =>
-    uploadSingleFile(file, files[index], thread, backboardURL)
+  const uploadPromises = files.map((file) =>
+    uploadSingleFileToBackboard(file, thread)
   );
 
   // Wait for ALL uploads to finish
@@ -85,5 +69,6 @@ export default async (ids) => {
     headers: { "X-API-Key": process.env.BACKBOARD_KEY },
   });
 
+  // TODO: actually return the questions
   return uploadedDocIds;
 };
