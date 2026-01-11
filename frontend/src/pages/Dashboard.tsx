@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import Logo from "@/components/icons/Logo";
 import { useAuth } from "@/context/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { getScoreBadgeVariant } from "@/utils/getScoreColors";
 
 const Dashboard = () => {
   const { logOutUser } = useAuth();
@@ -31,12 +32,6 @@ const Dashboard = () => {
     } catch (err) {
       console.log(err);
     }
-  };
-
-  const getScoreBadgeVariant = (score: number) => {
-    if (score >= 80) return "bg-success-muted text-success border-success/30";
-    if (score >= 50) return "bg-warning/10 text-warning border-warning/30";
-    return "bg-error-muted text-destructive border-destructive/30";
   };
 
   return (

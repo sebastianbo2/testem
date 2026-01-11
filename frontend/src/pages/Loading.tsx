@@ -75,7 +75,7 @@ export default function LoadingScreen() {
           Loading TESTEM
         </h3>
         <p className="text-sm text-muted-foreground animate-pulse">
-          Preparing your environment...
+          Just a sec...
         </p>
       </motion.div>
     </div>
