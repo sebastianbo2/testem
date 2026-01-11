@@ -3,7 +3,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FileText, File, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import getFormattedDate from "@/utils/formatDate";
+import formatDate from "@/utils/formatDate";
 import { formatBytes } from "@/utils/formatBytes";
 
 interface DocumentCardProps {
@@ -51,8 +51,7 @@ export const DocumentCard = ({
           {document["display_name"]}
         </h4>
         <p className="text-xs text-muted-foreground">
-          {formatBytes(document.size)} •{" "}
-          {getFormattedDate(document["created_at"])}
+          {formatBytes(document.size)} • {formatDate(document["created_at"])}
         </p>
       </div>
 

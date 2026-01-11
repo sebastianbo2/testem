@@ -148,7 +148,7 @@ export default function History() {
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Logo />
-          <div>
+          <div className="gap-2">
             <ThemeToggle />
             <Link to="/dashboard">
               <Button variant="ghost" size="sm">
