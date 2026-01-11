@@ -114,7 +114,7 @@ app.post("/api/files", async (req, res) => {
 });
 
 app.post("/api/answers", express.json(), (req, res) => {
-  const { questions } = req.body;
+  const { user_id, questions } = req.body;
 
   questions.forEach((question) => {
     question.modelAnswer = "$3x^2 + 4x - 5$";
@@ -122,21 +122,12 @@ app.post("/api/answers", express.json(), (req, res) => {
     randInt <= 0.5 ? (question.isCorrect = true) : (question.isCorrect = false);
   });
 
+  console.log("The user who did this exam is", user_id)
+
   console.log(questions.map((question) => question.userAnswer));
 
   res.json(questions);
 });
-
-// TODO: make endpoint dynamic through req.documentId then pass it to isDocReady
-// app.get("/api/checkDocStatus", async (req, res) => {
-//   try {
-//     const isReady = await isDocReady();
-//     res.json({ isReady });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: err.message });
-//   }
-// });
 
 app.listen(process.env.PORT || 8000, () => {
   console.log("Server is listening");
