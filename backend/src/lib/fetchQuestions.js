@@ -5,6 +5,7 @@ import {
   uploadSingleFileToBackboard,
 } from "../backboard/docUploader.js";
 import { getUserAssistant } from "../backboard/assistant.js";
+import backboard from "../config/backboardClient.js";
 
 export default async (ids) => {
   const fileRows = await getFilesFromDB(ids); // simple array containing document data
@@ -59,6 +60,58 @@ export default async (ids) => {
   await Promise.all(
     uploadedDocIds.map((docId) => isDocumentIndexed(docId, backboardURL))
   );
+
+  const msgFormData = new FormData()
+  const prompt = `Use the uploaded files to create an exam/test on the content present/relevant to the included documents Do not include questions already present in the document: Instead, Generate questions of the same topics.
+  Send back 5 questions that can be multiple choice, true-false, short answer, or long answer:
+  Output the questions in the following format: question~type~options~correctAnswer. Use '~' to separate each paramter and commas to separate options (only include options if question is multiple choice, if not include empty array: []).
+  For the question type, write them in the following format: 'multiple-choice'/'true-false'/'short-answer'/'long-answer'.
+  DO NOT OUTPUT ANY TEXT OTHER THAN EACH QUESTIONS (1 line per question csv style, but with '~' between params)`
+
+  // Send a message and stream the response
+  const stream = await backboard.addMessage(thread, {
+    content: prompt,
+    llm_provider: 'openai',
+    model_name: 'gpt-4o',
+    stream: true,
+    web_search: 'Auto'
+  });
+
+  let output = ""
+
+  // Print each chunk of content as it arrives
+  for await (const chunk of stream) {
+    if (chunk.type === 'content_streaming') {
+      output = output + chunk.content
+      // process.stdout.write(chunk.content || '');
+    } else if (chunk.type === 'message_complete') {
+      break;
+    }
+  }
+
+  console.log(output)
+
+  // msgFormData.append('content', prompt)
+  // msgFormData.append('llm_provider', '')
+  // msgFormData.append('model_name', '')
+  // msgFormData.append('stream', 'false')
+  // msgFormData.append('memory', 'off')
+  // msgFormData.append('web_search', 'off')
+  // msgFormData.append('send_to_llm', 'true')
+  // msgFormData.append('metadata', '')
+
+  // const msgResponse = await fetch(`${backboardURL}/threads/${thread}/messages`, {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'multipart/form-data',
+  //     'X-API-Key': `${process.env.BACKBOARD_KEY}`,
+  //   },
+  //   body: msgFormData,
+  // })
+
+  // const msgJson = await msgResponse.json();
+  
+  // console.log("MESSAGE REPLY: ", msgJson)
 
   console.log("✅ All files ready. Deleting thread...");
 
