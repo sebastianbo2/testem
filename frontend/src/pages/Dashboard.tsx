@@ -90,7 +90,7 @@ const Dashboard = () => {
   }, [pastExams]);
 
   const handleExamCardClick = (examId: string) => {
-    navigate("/past-exam", { state: { examId } });
+    navigate("/results", { state: { examId } });
   };
 
   const handleLogOut = async () => {

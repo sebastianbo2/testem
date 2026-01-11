@@ -13,7 +13,6 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { AuthContextProvider } from "./context/AuthContext";
 import ProtectedRoutes from "./components/ProtectedRoutes";
-import PastExam from "./pages/PastExam";
 import History from "./pages/History";
 
 const queryClient = new QueryClient();
@@ -36,7 +35,6 @@ const App = () => (
               <Route path="/history" element={<History />} />
               <Route path="/exam" element={<ActiveExam />} />
               <Route path="/results" element={<Results />} />
-              <Route path="/past-exam" element={<PastExam />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

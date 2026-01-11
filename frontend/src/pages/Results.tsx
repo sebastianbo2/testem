@@ -4,9 +4,11 @@ import { Brain, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CircularProgress } from "@/components/CircularProgress";
 import { QuestionCard } from "@/components/exam/QuestionCard";
-import { Question } from "@/types/exam";
+import { Exam, Question } from "@/types/exam";
 import { submitExam } from "@/lib/mockApi";
 import Logo from "@/components/icons/Logo";
+import LoadingScreen from "./LoadingScreen";
+import supabase from "@/config/supabaseClient";
 
 const Results = () => {
   const location = useLocation();
@@ -14,49 +16,59 @@ const Results = () => {
   const [score, setScore] = useState<number | null>(null);
   const [totalCorrect, setTotalCorrect] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [exam, setExam] = useState<Exam | null>(null);
 
-  const questions = location.state?.questions as Question[] | undefined;
-
-  console.log(questions);
+  const examId = location.state?.examId;
 
   useEffect(() => {
-    if (!questions) {
-      navigate("/documents");
-      return;
+    async function getExamData() {
+      const { data, error } = await supabase
+        .from("exams")
+        .select()
+        .eq("id", examId);
+
+      if (error) {
+        console.error("an error occured loading results/past exam: ", error);
+        return;
+      }
+
+      setExam(data[0]);
     }
 
-    // const calculateResults = async () => {
-    //   setIsLoading(true);
-    //   const result = await submitExam(questions);
-    //   setScore(result.score);
-    //   setTotalCorrect(result.totalCorrect);
-    //   setIsLoading(false);
-    // };
+    getExamData();
+  }, [examId]);
 
-    // calculateResults();
-  }, [questions, navigate]);
+  // const exam.questions = location.state?.exam.questions as Question[] | undefined;
+  // console.log(exam.questions);
 
-  if (!questions || isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse-subtle text-center">
-          <div className="w-24 h-24 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <Brain className="w-12 h-12 text-primary" />
-          </div>
-          <p className="text-muted-foreground">Calculating results...</p>
-        </div>
-      </div>
-    );
+  // useEffect(() => {
+  //   if (!examId) {
+  //     navigate("/documents");
+  //     return;
+  //   }
+  // }, [examId]);
+
+  const handleRetakeExam = () => {
+    navigate("/exam", { state: { examId } });
+  };
+
+  if (!exam || isLoading) {
+    return <LoadingScreen />;
   }
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="pointer-events-none">
-            <Logo />
-          </div>
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between relative">
+          <Logo />
+          <Button
+            variant="outline"
+            onClick={handleRetakeExam}
+            className="absolute left-[50%] translate-x-[-50%]"
+          >
+            Retake This Exam
+          </Button>
           <Button variant="outline" asChild className="gap-2">
             <Link to="/dashboard">
               <ArrowLeft className="w-4 h-4" />
@@ -73,15 +85,11 @@ const Results = () => {
           <CircularProgress value={score || 0} size={220} className="mb-6" />
 
           <h2 className="text-3xl font-bold text-foreground mb-2">
-            {score !== null && score >= 80
-              ? "Excellent Work!"
-              : score !== null && score >= 50
-              ? "Good Effort!"
-              : "Keep Practicing!"}
+            Review Your Exam
           </h2>
 
           <p className="text-muted-foreground mb-6">
-            You answered {totalCorrect} out of {questions.length} questions
+            You answered {totalCorrect} out of {exam.questions.length} questions
             correctly.
           </p>
 
@@ -93,19 +101,19 @@ const Results = () => {
             <div className="flex items-center gap-2 text-destructive">
               <XCircle className="w-5 h-5" />
               <span className="font-medium">
-                {questions.length - totalCorrect} Incorrect
+                {exam.questions.length - totalCorrect} Incorrect
               </span>
             </div>
           </div>
         </div>
 
-        {/* Questions Review */}
+        {/* questions Review */}
         <div className="max-w-3xl mx-auto space-y-6">
           <h3 className="text-xl font-semibold text-foreground mb-4">
             Review Your Answers
           </h3>
 
-          {questions.map((question, index) => (
+          {exam.questions.map((question, index) => (
             <QuestionCard
               key={index}
               question={question}
@@ -117,7 +125,7 @@ const Results = () => {
 
           <div className="flex justify-center pt-8">
             <Button asChild size="lg" className="gap-2 px-8">
-              <Link to="/">
+              <Link to="/dashboard">
                 <ArrowLeft className="w-5 h-5" />
                 Return to Dashboard
               </Link>

@@ -6,7 +6,7 @@ import { QuestionNavigator } from "@/components/exam/QuestionNavigator";
 import { QuestionCard } from "@/components/exam/QuestionCard";
 import { ExamLoadingState } from "@/components/ExamLoadingState";
 import { generateExam } from "@/lib/mockApi";
-import { Question, ExamConfig } from "@/types/exam";
+import { Exam, Question } from "@/types/exam";
 import { Link } from "react-router-dom";
 import { Document } from "@/types/exam";
 import Logo from "@/components/icons/Logo";
@@ -39,7 +39,27 @@ const ActiveExam = () => {
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>("");
-  const currExamId = useRef(location.state?.examId);
+  const [exam, setExam] = useState<Exam | null>(null);
+
+  const examId = location.state?.examId;
+
+  useEffect(() => {
+    async function getExamData() {
+      const { data, error } = await supabase
+        .from("exams")
+        .select()
+        .eq("id", examId);
+
+      if (error) {
+        console.error("an error occured loading exam: ", error);
+        return;
+      }
+
+      setExam(data[0]);
+    }
+
+    getExamData();
+  }, [examId]);
 
   const { session } = useAuth();
   useEffect(() => {
@@ -48,23 +68,17 @@ const ActiveExam = () => {
     }
   }, [session]);
 
-  const config = location.state?.config as ExamConfig | undefined;
-
   useEffect(() => {
-    if (!config) {
-      navigate("/documents");
-      return;
+    if (exam) {
+      const loadExam = async () => {
+        setIsLoading(true);
+        setQuestions(exam.questions);
+        setIsLoading(false);
+      };
+
+      loadExam();
     }
-
-    const loadExam = async () => {
-      setIsLoading(true);
-      const examQuestions = location.state?.questions as Question[] | undefined;
-      setQuestions(examQuestions);
-      setIsLoading(false);
-    };
-
-    loadExam();
-  }, [config, navigate]);
+  }, [exam]);
 
   const handleAnswerChange = (questionId: number, answer: string) => {
     setQuestions((prev) =>
@@ -96,7 +110,7 @@ const ActiveExam = () => {
         completed_at: new Date(),
         score: 67, // TODO: dynamic scoring
       })
-      .eq("id", currExamId.current);
+      .eq("id", examId);
 
     if (error) {
       console.error(
@@ -106,7 +120,7 @@ const ActiveExam = () => {
       return;
     }
 
-    navigate("/results", { state: { questions: answeredQuestions } });
+    navigate("/results", { state: { questions: answeredQuestions, examId } });
   };
 
   if (isLoading) {

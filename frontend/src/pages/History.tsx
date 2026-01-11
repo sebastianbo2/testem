@@ -135,7 +135,7 @@ export default function History() {
   };
 
   const handleCardClick = (examId: string) => {
-    navigate("/past-exam", { state: { examId } });
+    navigate("/results", { state: { examId } });
   };
 
   const SortIcon = ({ field }: { field: SortField }) => {
