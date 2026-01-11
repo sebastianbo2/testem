@@ -39,20 +39,43 @@ export default async (ids) => {
   console.log("THREAD ID: ", thread);
 
   // DOCUMENTS
-  console.log("🚀 Starting Uploads...");
-  const uploadPromises = files.map((file) =>
-    uploadSingleFileToBackboard(file, thread)
-  );
+  // console.log("🚀 Starting Uploads...");
+  // const uploadPromises = files.map((file) =>
+  //   uploadSingleFileToBackboard(file, thread)
+  // );
 
-  // Wait for ALL uploads to finish
-  const uploadedDocIds = (await Promise.all(uploadPromises)).filter(
-    (id) => id !== null
-  );
+  // // Wait for ALL uploads to finish
+  // const uploadedDocIds = (await Promise.all(uploadPromises)).filter(
+  //   (id) => id !== null
+  // );
 
-  console.log("IDS UPLOADED: ", uploadedDocIds);
+  // console.log("IDS UPLOADED: ", uploadedDocIds);
 
-  if (uploadedDocIds.length === 0) {
-    throw new Error("No files were uploaded successfully.");
+  // if (uploadedDocIds.length === 0) {
+  //   throw new Error("No files were uploaded successfully.");
+  // }
+
+  // // 4. INDEXING PHASE (The Fix)
+  // console.log("⏳ Waiting for Backboard to index files...");
+  // await Promise.all(
+  //   uploadedDocIds.map((docId) => isDocumentIndexed(docId, backboardURL))
+  // );
+
+  // console.log("✅ All files ready. Deleting thread...");
+
+  const thread_resp = await backboard.addMessage(thread, {
+    content: "what is my name and favorite color",
+    llm_provider: "openai",
+    model_name: "gpt-4o",
+    stream: true,
+  });
+
+  for await (const chunk of thread_resp) {
+    if (chunk.type === "content_streaming") {
+      process.stdout.write(chunk.content || "");
+    } else if (chunk.type === "message_complete") {
+      break;
+    }
   }
 
   // 4. INDEXING PHASE (The Fix)

@@ -85,7 +85,7 @@ app.post("/api/files", async (req, res) => {
   const fileIds = req.body.fileIds;
 
   const questions = await fetchQuestions(fileIds);
-  console.log(questions);
+  // console.log(questions);
 
   res.json(questions);
 });

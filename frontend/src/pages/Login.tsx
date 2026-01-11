@@ -3,6 +3,7 @@ import { GoogleIcon, FacebookIcon } from "@/components/icons/CustomIcons";
 import Logo from "@/components/icons/Logo";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import BackgroundElements from "@/components/BackgroundElements";
 
 export default function Login() {
   const [open, setOpen] = useState(false);
@@ -77,6 +78,8 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center p-4 sm:p-8 bg-[radial-gradient(ellipse_at_50%_50%,_hsl(210,100%,97%),_hsl(0,0%,100%))] dark:bg-[radial-gradient(at_50%_50%,_hsla(210,100%,16%,0.5),_hsl(220,30%,5%))]">
+      <BackgroundElements />
+
       {/* Card Container */}
       <div className="w-full max-w-[450px] bg-card text-card-foreground border border-border p-8 rounded-lg shadow-card space-y-6">
         <div className="flex flex-col gap-2">
