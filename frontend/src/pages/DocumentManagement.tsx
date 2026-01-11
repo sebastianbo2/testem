@@ -21,23 +21,7 @@ import Logo from "@/components/icons/Logo";
 import DeleteFolderBanner from "@/components/folders/DeleteFolderBanner";
 import CreateFolderBanner from "@/components/folders/CreateFolderBanner";
 import { useAuth } from "@/context/AuthContext";
-
-const requestFiles = async (fileIds: string[]) => {
-  const params = new URLSearchParams();
-
-  fileIds.forEach((id) => params.append("fileIds", id));
-
-  const link = `${
-    import.meta.env.VITE_SERVER_URL
-  }/api/files?${params.toString()}`;
-
-  const response = await fetch(link);
-
-  const json = response.json();
-
-  console.log(json);
-  return json;
-};
+import requestFiles from "@/api/requestFiles";
 
 const DocumentManagement = () => {
   const navigate = useNavigate();
@@ -119,8 +103,8 @@ const DocumentManagement = () => {
         // unique path to avoid collisions
         const docId = crypto.randomUUID();
         const fileExt = uploadedFile.name.split(".").pop();
-        const uniqueFileName = `${docId}.${fileExt}`;
-        const storagePath = `${currentUserId}/${uploadedFile.name}__${uniqueFileName}`;
+        const uniqueFileName = `${uploadedFile.name}__${docId}.${fileExt}`;
+        const storagePath = `${currentUserId}/${uniqueFileName}`;
 
         // upload "uploadedFile" to supabase "documents" bucket
         const { data: storageData, error: storageError } =
@@ -137,7 +121,7 @@ const DocumentManagement = () => {
           .from("documents")
           .insert([
             {
-              id: docId,
+              id: uniqueFileName,
               user_id: currentUserId,
               display_name: uploadedFile.name,
               storage_path: storagePath,
