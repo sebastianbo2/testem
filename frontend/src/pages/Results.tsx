@@ -21,7 +21,7 @@ const Results = () => {
 
   useEffect(() => {
     if (!questions) {
-      navigate("/");
+      navigate("/documents");
       return;
     }
 

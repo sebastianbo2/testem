@@ -18,12 +18,12 @@ export interface ExamConfig {
 
 export interface Exam {
   id: string;
-  title: string;
-  subject: string;
+  user_id: string;
   questions: Question[];
+  score?: number;
   createdAt: Date;
   completedAt?: Date;
-  score?: number;
+  title?: string;
 }
 
 export interface Document {
