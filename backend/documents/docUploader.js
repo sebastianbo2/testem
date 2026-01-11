@@ -1,5 +1,3 @@
-import backboard from "../config/backboardClient.js";
-
 /**
  * Uploads a single file to backboard API
  * @param {Blob} blob
@@ -37,7 +35,7 @@ export const uploadSingleFile = async (blob, fileMetadata, threadId) => {
 /**
  * Checks if a document is done indexing into backboard API
  * @param {string} docId
- * @returns whether the document is successfully indexed
+ * @returns whether the document is successfully indexed. False indicates that timeout exceeded
  */
 export const isDocumentIndexed = async (docId) => {
   const maxRetries = 10;

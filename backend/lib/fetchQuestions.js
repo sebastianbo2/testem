@@ -1,42 +1,16 @@
-import { getById } from "./db_request.js";
+import { getFilesFromDB } from "./db_requests.js";
 import supabase from "../config/supabaseClient.js";
-import { uploadSingleFile, isDocumentIndexed } from "../documents/documents.js";
-
-const getFilesFromDB = async (ids) => {
-  const files = await Promise.all(ids.map((id) => getById("documents", id)));
-
-  return files;
-};
-
-const getFileBlobs = async (files) => {
-  // 1. Use Promise.all to wait for all async downloads in the map
-  const fileDataArray = await Promise.all(
-    files.map(async (file) => {
-      const { data, error } = await supabase.storage
-        .from("documents")
-        .download(file.storage_path);
-
-      if (error) {
-        console.error(`Error downloading ${file.storage_path}:`, error);
-        return null;
-      }
-
-      // 2. data is a Blob. To treat it like a File (useful for Backboard/FormData):
-      return new File([data], file.name || "document.pdf", {
-        type: data.type || "application/pdf",
-      });
-    })
-  );
-
-  // 3. Return the array of File objects, filtering out any failures
-  return fileDataArray.filter((f) => f !== null);
-};
+import { downloadFilesFromDB } from "../documents/downloadFilesFromDB.js";
+import {
+  isDocumentIndexed,
+  uploadSingleFile,
+} from "../documents/docUploader.js";
 
 export default async (ids) => {
-  const files = await getFilesFromDB(ids);
-  const blobs = await getFileBlobs(files);
+  const fileRows = await getFilesFromDB(ids); // simple array containing document data
+  const files = await downloadFilesFromDB(fileRows); // actual File object
 
-  const user = files[0].user_id;
+  const user = fileRows[0].user_id;
 
   console.log("USER: ", user);
 
@@ -80,10 +54,9 @@ export default async (ids) => {
   console.log("THREAD ID: ", thread);
 
   // DOCUMENTS
-  // 3. UPLOAD PHASE (The Fix)
   console.log("🚀 Starting Uploads...");
-  const uploadPromises = blobs.map((blob, index) =>
-    uploadSingleFile(blob, files[index], thread, backboardURL)
+  const uploadPromises = files.map((file, index) =>
+    uploadSingleFile(file, files[index], thread, backboardURL)
   );
 
   // Wait for ALL uploads to finish

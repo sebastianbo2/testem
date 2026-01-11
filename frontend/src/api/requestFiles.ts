@@ -1,17 +1,11 @@
 export default async function requestFiles(fileIds: string[]) {
-  const params = new URLSearchParams();
+  const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/files`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fileIds: fileIds }),
+  });
 
-  fileIds.forEach((id) => params.append("fileIds", id));
-
-  console.log(params)
-
-  const link = `${
-    import.meta.env.VITE_SERVER_URL
-  }/api/files?${params.toString()}`;
-
-  const response = await fetch(link);
-
-  const json = response.json();
+  const json = await response.json();
 
   console.log(json);
   return json;

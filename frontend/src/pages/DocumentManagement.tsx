@@ -21,7 +21,7 @@ import Logo from "@/components/icons/Logo";
 import DeleteFolderBanner from "@/components/folders/DeleteFolderBanner";
 import CreateFolderBanner from "@/components/folders/CreateFolderBanner";
 import { useAuth } from "@/context/AuthContext";
-import requestFiles from "@/api/requestFiles";
+import requestFiles from "@/api/requestFiles.ts";
 
 const DocumentManagement = () => {
   const navigate = useNavigate();

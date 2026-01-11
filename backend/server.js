@@ -7,8 +7,8 @@ import {
   summarize,
   isDocReady,
 } from "./documents/documentsOld.js";
-import { createNewAssistant } from "./documents/createNewAssistant.js";
-import { getById } from "./lib/db_request.js";
+import { createNewAssistant } from "./backboard/createNewAssistant.js";
+import { getRowByIdFromTable } from "./lib/db_requests.js";
 import supabase from "./config/supabaseClient.js";
 import fetchQuestions from "./lib/fetchQuestions.js";
 
@@ -92,11 +92,6 @@ const sampleQuestions = [
 app.post("/api/files", async (req, res) => {
   const fileIds = req.body.fileIds;
 
-  // console.log(fileIds);
-  // res.json({ fileIds: fileIds });
-
-  // const ids = Array.isArray(fileIds) ? fileIds : fileIds ? [fileIds] : [];
-
   const questions = await fetchQuestions(fileIds);
   console.log(questions);
 
@@ -115,29 +110,6 @@ app.post("/api/answers", express.json(), (req, res) => {
   console.log(questions.map((question) => question.userAnswer));
 
   res.json(questions);
-});
-
-app.post("/api/upload", upload.single("file"), async (req, res) => {
-  try {
-    const docId = await uploadDocToThread(
-      req.file.buffer,
-      req.file.originalname
-    );
-    res.json({ ok: true, documentId: docId });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post("/api/summarize", async (req, res) => {
-  try {
-    const summary = await summarize();
-    res.json({ summary });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
 });
 
 // TODO: make endpoint dynamic through req.documentId then pass it to isDocReady
