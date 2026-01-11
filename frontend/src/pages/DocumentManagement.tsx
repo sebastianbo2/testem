@@ -151,7 +151,9 @@ const DocumentManagement = () => {
 
   // TODO: better error handling, possibly with BannerWrapper.tsx
   useEffect(() => {
-    console.error("An error occured: ", error);
+    if (error) {
+      console.error("An error occured: ", error);
+    }
   }, [error]);
 
   const handleDocumentSelect = (id: string, selected: boolean) => {
@@ -217,10 +219,33 @@ const DocumentManagement = () => {
     setIsConfigModalOpen(false);
     setLoadingExam(true);
 
+    const questions = await requestFiles(Array.from(selectedDocIds));
+
+    const examTitle = `${documents[0].display_name}${
+      documents.length > 1 ? ` and ${documents.length - 1} others` : ""
+    }`;
+    const { data, error } = await supabase
+      .from("exams")
+      .insert([
+        {
+          title: examTitle,
+          user_id: currentUserId,
+          questions: questions,
+        },
+      ])
+      .select();
+
+    if (error) {
+      setError(error);
+      return;
+    }
+
+    console.log(data[0].id);
     navigate("/exam", {
       state: {
         config,
-        questions: await requestFiles(Array.from(selectedDocIds)),
+        questions: questions,
+        examId: data[0].id,
       },
     });
   };
@@ -302,8 +327,6 @@ const DocumentManagement = () => {
   };
 
   const handleCreateFolder = async (name: string) => {
-    console.log(currentUserId);
-    console.log(session);
     const { data, error } = await supabase
       .from("folders")
       .insert([{ name, user_id: currentUserId }])
