@@ -1,0 +1,5 @@
+What is the antiderivative of \(x^{-2}\)?~short-answer~[]~\(-\frac{1}{x} + C\)  
+Determine the indefinite integral of \(\cos(x)\).~short-answer~[]~\(\sin(x) + C\)  
+True or False: The indefinite integral of a sum of two functions is equal to the sum of their indefinite integrals.~true-false~[]~True  
+Find \(\int (4x^3 - 2x^{-1}) \, dx.\)~short-answer~[]~\(x^4 - 2\ln|x| + C\)  
+Which of the following represents the indefinite integral of a constant \(a\)?~multiple-choice~a\( \cdot x + C \), \(\frac{a}{2}x^2 + C\), \(ae^x + C\), \(a/\ln(x) + C\)~a\( \cdot x + C \)  

@@ -5,6 +5,7 @@ import { createNewAssistant } from "./backboard/assistant.js";
 import { getRowByIdFromTable } from "./lib/db_requests.js";
 import supabase from "./config/supabaseClient.js";
 import fetchQuestions from "./lib/fetchQuestions.js";
+import { readFile } from "fs/promises";
 
 const app = express();
 const upload = multer();
@@ -84,10 +85,14 @@ const sampleQuestions = [
 app.post("/api/files", async (req, res) => {
   const fileIds = req.body.fileIds;
 
-  const questions = await fetchQuestions(fileIds);
+  // const questions = await fetchQuestions(fileIds);
   // console.log(questions);
 
-  res.json(questions);
+  const output = await readFile("output.txt", "utf8");
+
+  console.log("OUTPUT:", output)
+
+  res.json(sampleQuestions);
 });
 
 app.post("/api/answers", express.json(), (req, res) => {
