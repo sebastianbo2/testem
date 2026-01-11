@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GoogleIcon, FacebookIcon } from "@/components/icons/CustomIcons";
 import Logo from "@/components/icons/Logo";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import BackgroundElements from "@/components/BackgroundElements";
+import Loading from "./Loading";
 
 export default function Login() {
   const [open, setOpen] = useState(false);
@@ -17,7 +18,13 @@ export default function Login() {
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
 
-  const { logInUser } = useAuth();
+  const { loading: authLoading, session, logInUser } = useAuth();
+
+  useEffect(() => {
+    if (session) {
+      navigate("/dashboard");
+    }
+  }, [session]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -75,6 +82,10 @@ export default function Login() {
 
     return isValid;
   };
+
+  if (loading || authLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center p-4 sm:p-8 bg-[radial-gradient(ellipse_at_50%_50%,_hsl(210,100%,97%),_hsl(0,0%,100%))] dark:bg-[radial-gradient(at_50%_50%,_hsla(210,100%,16%,0.5),_hsl(220,30%,5%))]">
