@@ -8,15 +8,64 @@ import { Question } from "@/types/exam";
 import { submitExam } from "@/lib/mockApi";
 import Logo from "@/components/icons/Logo";
 
-const Results = () => {
+// TMP ANSWERED QUESTIONS
+const questions: Question[] = [
+  {
+    question: "What is the derivative of $f(x) = x^3 + 2x^2 - 5x + 1$?",
+    type: "multiple-choice",
+    options: [
+      "$3x^2 + 4x - 5$",
+      "$3x^2 + 2x - 5$",
+      "$x^2 + 4x - 5$",
+      "$3x^3 + 4x^2 - 5$",
+    ],
+    modelAnswer: "$3x^2 + 4x - 5$",
+    isCorrect: true,
+  },
+  {
+    question: "\n\\[\n\\int_0^1 x^2 dx = \\frac{1}{3}\n\\]\n",
+    type: "true-false",
+    options: ["True", "False"],
+    modelAnswer: "$3x^2 + 4x - 5$",
+    isCorrect: true,
+  },
+  {
+    question: "Evaluate the limit: $\\lim_{x \\to 0} \\frac{\\sin(x)}{x}$",
+    type: "short-answer",
+    options: [],
+    modelAnswer: "$3x^2 + 4x - 5$",
+    isCorrect: false,
+  },
+  {
+    question: "Which matrix operation is NOT commutative?",
+    type: "multiple-choice",
+    options: [
+      "Addition",
+      "Scalar multiplication",
+      "Matrix multiplication",
+      "Transpose",
+    ],
+    modelAnswer: "$3x^2 + 4x - 5$",
+    isCorrect: true,
+  },
+  {
+    question:
+      "Explain the concept of eigenvalues and provide the formula for finding them for a 2×2 matrix.",
+    type: "long-answer",
+    options: [],
+    modelAnswer: "$3x^2 + 4x - 5$",
+    isCorrect: false,
+  },
+];
+
+const PastExam = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [score, setScore] = useState<number | null>(null);
   const [totalCorrect, setTotalCorrect] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  const questions = location.state?.questions as Question[] | undefined;
-
+  // const questions = location.state?.questions as Question[] | undefined;
   console.log(questions);
 
   useEffect(() => {
@@ -53,10 +102,14 @@ const Results = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="pointer-events-none">
-            <Logo />
-          </div>
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between relative">
+          <Logo />
+          <Button
+            variant="outline"
+            className="absolute left-[50%] translate-x-[-50%]"
+          >
+            Retake This Exam
+          </Button>
           <Button variant="outline" asChild className="gap-2">
             <Link to="/dashboard">
               <ArrowLeft className="w-4 h-4" />
@@ -73,11 +126,7 @@ const Results = () => {
           <CircularProgress value={score || 0} size={220} className="mb-6" />
 
           <h2 className="text-3xl font-bold text-foreground mb-2">
-            {score !== null && score >= 80
-              ? "Excellent Work!"
-              : score !== null && score >= 50
-              ? "Good Effort!"
-              : "Keep Practicing!"}
+            Review Your Exam
           </h2>
 
           <p className="text-muted-foreground mb-6">
@@ -117,7 +166,7 @@ const Results = () => {
 
           <div className="flex justify-center pt-8">
             <Button asChild size="lg" className="gap-2 px-8">
-              <Link to="/">
+              <Link to="/dashboard">
                 <ArrowLeft className="w-5 h-5" />
                 Return to Dashboard
               </Link>
@@ -129,4 +178,4 @@ const Results = () => {
   );
 };
 
-export default Results;
+export default PastExam;

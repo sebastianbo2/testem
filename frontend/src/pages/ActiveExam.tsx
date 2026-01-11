@@ -11,10 +11,11 @@ import { Link } from "react-router-dom";
 import { Document } from "@/types/exam";
 import Logo from "@/components/icons/Logo";
 import { useAuth } from "@/context/AuthContext";
+import supabase from "@/config/supabaseClient";
 
 type UploadStatus = "idle" | "uploading" | "indexing" | "success" | "error";
 
-const validateAnswers = async (questions: Question[], user) => {
+const validateAnswers = async (questions: Question[], user: string) => {
   const response = await fetch(
     `${import.meta.env.VITE_SERVER_URL}/api/answers`,
     {
@@ -37,10 +38,15 @@ const ActiveExam = () => {
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>("");
+  const currExamId = useRef(location.state?.examId);
 
   const { session } = useAuth();
-
-  const user = session.user.id
+  useEffect(() => {
+    if (session) {
+      setCurrentUserId(session.user.id);
+    }
+  }, [session]);
 
   const config = location.state?.config as ExamConfig | undefined;
 
@@ -80,7 +86,25 @@ const ActiveExam = () => {
   };
 
   const handleSubmitExam = async () => {
-    const answeredQuestions = await validateAnswers(questions, user);
+    const answeredQuestions = await validateAnswers(questions, currentUserId);
+
+    // update supabase
+    const { data, error } = await supabase
+      .from("exams")
+      .update({
+        questions: answeredQuestions,
+        completed_at: new Date(),
+        score: 67, // TODO: dynamic scoring
+      })
+      .eq("id", currExamId.current);
+
+    if (error) {
+      console.error(
+        "an error occured while updating exam entry in supabase: ",
+        error
+      );
+      return;
+    }
 
     navigate("/results", { state: { questions: answeredQuestions } });
   };
