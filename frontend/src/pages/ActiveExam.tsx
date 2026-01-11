@@ -10,10 +10,11 @@ import { Question, ExamConfig } from "@/types/exam";
 import { Link } from "react-router-dom";
 import { Document } from "@/types/exam";
 import Logo from "@/components/icons/Logo";
+import { useAuth } from "@/context/AuthContext";
 
 type UploadStatus = "idle" | "uploading" | "indexing" | "success" | "error";
 
-const validateAnswers = async (questions: Question[]) => {
+const validateAnswers = async (questions: Question[], user) => {
   const response = await fetch(
     `${import.meta.env.VITE_SERVER_URL}/api/answers`,
     {
@@ -21,7 +22,7 @@ const validateAnswers = async (questions: Question[]) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ questions }),
+      body: JSON.stringify({ user_id: user, questions: questions }),
     }
   );
 
@@ -36,6 +37,10 @@ const ActiveExam = () => {
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [questions, setQuestions] = useState<Question[]>([]);
+
+  const { session } = useAuth();
+
+  const user = session.user.id
 
   const config = location.state?.config as ExamConfig | undefined;
 
@@ -75,7 +80,7 @@ const ActiveExam = () => {
   };
 
   const handleSubmitExam = async () => {
-    const answeredQuestions = await validateAnswers(questions);
+    const answeredQuestions = await validateAnswers(questions, user);
 
     navigate("/results", { state: { questions: answeredQuestions } });
   };

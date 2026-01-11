@@ -1,0 +1,5 @@
+NO~The antiderivative of \(x^{-2}\) is \(-x^{-1} + C\) where \(C\) is the constant of integration.  
+NO~The indefinite integral of \(\cos(x)\) is \(\sin(x) + C\).  
+NO~True; the indefinite integral of a sum of functions is equal to the sum of their indefinite integrals: \(\int (f(x) + g(x)) \, dx = \int f(x) \, dx + \int g(x) \, dx\).  
+NO~The integral of \((4x^3 - 2x^{-1}) \, dx\) is \(x^4 - 2\ln|x| + C\).  
+NO~The indefinite integral of a constant \(a\) is \(ax + C\) where \(C\) is the constant of integration.

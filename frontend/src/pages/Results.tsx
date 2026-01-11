@@ -54,9 +54,11 @@ const Results = () => {
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Logo />
+          <div className="pointer-events-none">
+            <Logo />
+          </div>
           <Button variant="outline" asChild className="gap-2">
-            <Link to="/">
+            <Link to="/dashboard">
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
             </Link>

@@ -8,13 +8,7 @@ import { getUserAssistant } from "../backboard/assistant.js";
 import backboard from "../config/backboardClient.js";
 import { writeFile } from "fs/promises";
 
-export default async (ids) => {
-  const fileRows = await getFilesFromDB(ids); // simple array containing document data
-  const files = await downloadFilesFromDB(fileRows); // actual File object
-
-  const user_id = fileRows[0].user_id;
-  console.log("USER: ", user_id);
-
+export default async (questions, user_id) => {
   const backboardURL = `https://app.backboard.io/api`;
 
   // ASSISTANT
@@ -39,28 +33,6 @@ export default async (ids) => {
 
   console.log("THREAD ID: ", thread);
 
-  console.log("🚀 Starting Uploads...");
-  const uploadPromises = files.map((file) =>
-    uploadSingleFileToBackboard(file, thread)
-  );
-
-  // Wait for ALL uploads to finish
-  const uploadedDocIds = (await Promise.all(uploadPromises)).filter(
-    (id) => id !== null
-  );
-
-  console.log("IDS UPLOADED: ", uploadedDocIds);
-
-  if (uploadedDocIds.length === 0) {
-    throw new Error("No files were uploaded successfully.");
-  }
-
-  // 4. INDEXING PHASE (The Fix)
-  console.log("⏳ Waiting for Backboard to index files...");
-  await Promise.all(
-    uploadedDocIds.map((docId) => isDocumentIndexed(docId, backboardURL))
-  );
-
   // const thread_resp = await backboard.addMessage(thread, {
   //   content: "what is my name and favorite color",
   //   llm_provider: "openai",
@@ -83,11 +55,23 @@ export default async (ids) => {
   // );
 
   const msgFormData = new FormData()
-  const prompt = `Use the uploaded files to create an exam/test on the content present/relevant to the included documents Do not include questions already present in the document: Instead, Generate questions of the same topics.
-  Send back 5 questions that can be multiple choice, true-false, short answer, or long answer:
-  Output the questions in the following format: question~type~options~correctAnswer. Use '~' to separate each paramter and commas to separate options (only include options if question is multiple choice (wihtout array borders [ and ] at first and last question), if not include empty array: []).
-  For the question type, write them in the following format: 'multiple-choice'/'true-false'/'short-answer'/'long-answer'.
-  DO NOT OUTPUT ANY TEXT OTHER THAN EACH QUESTIONS (1 line per question csv style, but with '~' between params)`
+  let prompt = `You will receive questions provided by you and user answers to those questions at the end of this message.
+  Send back two parameters per question (again, separated by '~' between parameter, and one line/row of parameters for each question). The first parameter must be a 'YES' if the answer is correct and 'NO' if the answer is not correct. 
+  For short answer questions and long answer questions, grade them as if you are a university level teacher (if the answer is correct enough, about 80% correct then it should be treated as a correct answer).
+  For the second paramter output the most correct answer you can come up with (for more theoretical/variable questions), or just the correct answer for more numerical problems.
+  DO NOT OUTPUT ANY TEXT OTHER THAN THE PARAMTERES SEPARATED LINE-BY-LINE PER QUESTION
+  
+  Here are the questions and answers:
+  
+  `
+
+  questions.forEach((question, index) => {
+    let line = ""
+
+    line = line + `${index + 1}. ${question.question}\nUser Answer: ${question.userAnswer}`
+
+    prompt = prompt + line
+  })
 
   // Send a message and stream the response
   const stream = await backboard.addMessage(thread, {
@@ -110,25 +94,26 @@ export default async (ids) => {
     }
   }
 
-  await writeFile("output.txt", output);
+  await writeFile("answered.txt", output);
+  
+  console.log(output)
 
-  const lines = output.split(/\r?\n/);
-  let questions = []
+//   const lines = output.split(/\r?\n/);
 
-  lines.forEach((line) => {
-    const params = line.split("~")
+//   lines.forEach((line) => {
+//     const params = line.split("~")
 
-    console.log("PARAMS: ", params)
+//     console.log("PARAMS: ", params)
 
-    const question = {
-      question: params[0],
-      type: params[1],
-      options: params[1] === "multiple-choice" ? params[2].split(",").map(option => option.trim()) : [],
-      correctAnswer: params[3]
-    }
+//     const question = {
+//       question: params[0],
+//       type: params[1],
+//       options: params[1] === "multiple-choice" ? params[2].split(",").map(option => option.trim()) : [],
+//       correctAnswer: params[3]
+//     }
 
-    questions.push(question)
-  })
+//     questions.push(question)
+//   })
   
 
   // msgFormData.append('content', prompt)
@@ -163,5 +148,5 @@ export default async (ids) => {
   });
 
   // TODO: actually return the questions
-  return questions;
+  return output;
 };

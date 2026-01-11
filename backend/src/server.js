@@ -6,6 +6,7 @@ import { getRowByIdFromTable } from "./lib/db_requests.js";
 import supabase from "./config/supabaseClient.js";
 import fetchQuestions from "./lib/fetchQuestions.js";
 import { readFile } from "fs/promises";
+import fetchAnswers from "./lib/fetchAnswers.js";
 
 const app = express();
 const upload = multer();
@@ -92,33 +93,49 @@ app.post("/api/files", async (req, res) => {
 
   console.log("OUTPUT:", output)
 
-  res.json(sampleQuestions);
+  const lines = output.split(/\r?\n/);
+  let questions = []
+
+  lines.forEach((line) => {
+    const params = line.split("~")
+
+    console.log("PARAMS: ", params)
+
+    const question = {
+      question: params[0],
+      type: params[1],
+      options: params[1] === "multiple-choice" ? params[2].split(",").map(option => option.trim()) : [],
+      correctAnswer: params[3]
+    }
+
+    questions.push(question)
+  })
+
+  res.json(questions);
 });
 
-app.post("/api/answers", express.json(), (req, res) => {
-  const { questions } = req.body;
+app.post("/api/answers", express.json(), async (req, res) => {
+  const { user_id, questions } = req.body;
 
-  questions.forEach((question) => {
-    question.modelAnswer = "$3x^2 + 4x - 5$";
-    const randInt = Math.random();
-    randInt <= 0.5 ? (question.isCorrect = true) : (question.isCorrect = false);
-  });
+  console.log("The user who did this exam is", user_id)
+
+  const output = await readFile("answered.txt", "utf8") // comment this
+
+  // const output = await fetchAnswers(questions, user_id); // uncomment this
+
+  const lines = output.split(/\r?\n/);
+
+  lines.forEach((line, index) => {
+    const params = line.split("~")
+
+    questions[index].isCorrect = params[0].toLowerCase().trim() === "yes" ? true : false
+    questions[index].modelAnswer = params[1].trim()
+  })
 
   console.log(questions.map((question) => question.userAnswer));
 
   res.json(questions);
 });
-
-// TODO: make endpoint dynamic through req.documentId then pass it to isDocReady
-// app.get("/api/checkDocStatus", async (req, res) => {
-//   try {
-//     const isReady = await isDocReady();
-//     res.json({ isReady });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: err.message });
-//   }
-// });
 
 app.listen(process.env.PORT || 8000, () => {
   console.log("Server is listening");
