@@ -87,7 +87,7 @@ app.post("/api/files", async (req, res) => {
   const questions = await fetchQuestions(fileIds);
   // console.log(questions);
 
-  res.json({ sampleQuestions: sampleQuestions });
+  res.json(questions);
 });
 
 app.post("/api/answers", express.json(), (req, res) => {

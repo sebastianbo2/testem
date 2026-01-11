@@ -1,3 +1,7 @@
+import dotenv from 'dotenv'
+
+dotenv.config()
+
 /**
  * Uploads a single file to backboard API
  * @param {File} file - The File object (which contains the name and type)
