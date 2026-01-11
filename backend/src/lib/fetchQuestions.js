@@ -6,6 +6,7 @@ import {
 } from "../backboard/docUploader.js";
 import { getUserAssistant } from "../backboard/assistant.js";
 import backboard from "../config/backboardClient.js";
+import { writeFile } from "fs/promises";
 
 export default async (ids) => {
   const fileRows = await getFilesFromDB(ids); // simple array containing document data
@@ -84,7 +85,7 @@ export default async (ids) => {
   const msgFormData = new FormData()
   const prompt = `Use the uploaded files to create an exam/test on the content present/relevant to the included documents Do not include questions already present in the document: Instead, Generate questions of the same topics.
   Send back 5 questions that can be multiple choice, true-false, short answer, or long answer:
-  Output the questions in the following format: question~type~options~correctAnswer. Use '~' to separate each paramter and commas to separate options (only include options if question is multiple choice, if not include empty array: []).
+  Output the questions in the following format: question~type~options~correctAnswer. Use '~' to separate each paramter and commas to separate options (only include options if question is multiple choice (wihtout array borders [ and ] at first and last question), if not include empty array: []).
   For the question type, write them in the following format: 'multiple-choice'/'true-false'/'short-answer'/'long-answer'.
   DO NOT OUTPUT ANY TEXT OTHER THAN EACH QUESTIONS (1 line per question csv style, but with '~' between params)`
 
@@ -108,6 +109,8 @@ export default async (ids) => {
       break;
     }
   }
+
+  await writeFile("output.txt", output);
 
   const lines = output.split(/\r?\n/);
   let questions = []
