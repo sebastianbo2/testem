@@ -13,8 +13,7 @@ import Logo from "@/components/icons/Logo";
 import { useAuth } from "@/context/AuthContext";
 import supabase from "@/config/supabaseClient";
 import GradingLoading from "./loading/GradingLoading";
-
-type UploadStatus = "idle" | "uploading" | "indexing" | "success" | "error";
+import { useExamSession } from "@/hooks/useExamSession";
 
 const validateAnswers = async (questions: Question[], user: string) => {
   const response = await fetch(
@@ -34,45 +33,13 @@ const validateAnswers = async (questions: Question[], user: string) => {
 const ActiveExam = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [status, setStatus] = useState<UploadStatus>("idle");
-  const [questions, setQuestions] = useState<Question[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>("");
-  const [exam, setExam] = useState<Exam | null>(null);
   const [isGrading, setIsGrading] = useState(false);
 
-  const examId = location.state?.examId;
-
-  useEffect(() => {
-    if (!examId) {
-      navigate("/dashboard");
-    }
-
-    async function getExamData() {
-      const { data, error } = await supabase
-        .from("exams")
-        .select()
-        .eq("id", examId);
-
-      if (error) {
-        console.error("an error occured loading exam: ", error);
-        return;
-      }
-
-      // Clear previous user answers if user is retaking the same exam
-      data[0].questions.forEach((question: Question) => {
-        if (question.userAnswer) {
-          delete question.userAnswer;
-        }
-      });
-
-      setExam(data[0]);
-    }
-
-    getExamData();
-  }, [examId]);
+  const { questions, setQuestions, examTitle, examId, isLoading } =
+    useExamSession();
 
   const { session } = useAuth();
   useEffect(() => {
@@ -80,18 +47,6 @@ const ActiveExam = () => {
       setCurrentUserId(session.user.id);
     }
   }, [session]);
-
-  useEffect(() => {
-    if (exam) {
-      const loadExam = async () => {
-        setIsLoading(true);
-        setQuestions(exam.questions);
-        setIsLoading(false);
-      };
-
-      loadExam();
-    }
-  }, [exam]);
 
   const handleAnswerChange = (questionId: number, answer: string) => {
     setQuestions((prev) =>
@@ -115,37 +70,61 @@ const ActiveExam = () => {
   const handleSubmitExam = async () => {
     setIsGrading(true);
 
-    const answeredQuestions = await validateAnswers(questions, currentUserId);
+    try {
+      console.log("SENDING TO SERVER:", JSON.stringify(questions[0], null, 2)); // Check the first question structure
 
-    // 2. Calculate the metrics
-    const totalQuestions = answeredQuestions.length;
-    const numCorrect = answeredQuestions.filter(
-      (q: Question) => q.isCorrect
-    ).length;
+      // A. Grade
+      const correctedQuestions = await validateAnswers(
+        questions,
+        currentUserId
+      );
+      console.log(correctedQuestions);
 
-    // Dynamic Score Calculation
-    const finalScore =
-      totalQuestions > 0 ? Math.round((numCorrect / totalQuestions) * 100) : 0;
+      const totalQuestions = correctedQuestions.length;
+      const numCorrect = correctedQuestions.filter(
+        (q: Question) => q.isCorrect
+      ).length;
+      const finalScore =
+        totalQuestions > 0
+          ? Math.round((numCorrect / totalQuestions) * 100)
+          : 0;
 
-    // 3. Update Supabase
-    const { error } = await supabase
-      .from("exams")
-      .update({
-        questions: answeredQuestions, // The raw data (for review)
-        score: finalScore, // Pre-calculated for sorting/stats
+      const payload = {
+        title: examTitle,
+        questions: correctedQuestions,
+        score: finalScore,
         correct_count: numCorrect,
         completed_at: new Date(),
-      })
-      .eq("id", examId);
+        user_id: currentUserId,
+      };
 
-    if (error) {
-      console.error("Supabase update error: ", error);
+      let resultId = examId;
+
+      if (examId) {
+        // SCENARIO A: UPDATE (Retake) - Overwrite existing row
+        const { error } = await supabase
+          .from("exams")
+          .update(payload)
+          .eq("id", examId);
+
+        if (error) throw error;
+      } else {
+        // SCENARIO B: INSERT (New Exam) - Create row for the first time
+        const { data, error } = await supabase
+          .from("exams")
+          .insert(payload)
+          .select()
+          .single();
+
+        if (error) throw error;
+        resultId = data.id;
+      }
+
+      navigate("/results", { state: { examId: resultId } });
+    } catch (error) {
+      console.error("Submission error:", error);
       setIsGrading(false);
-      return;
     }
-
-    // 4. Navigate (Only pass the ID; let the Results page fetch the fresh data)
-    navigate("/results", { state: { examId } });
   };
 
   if (isLoading) {

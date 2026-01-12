@@ -221,33 +221,24 @@ const DocumentManagement = () => {
 
     const questions = await requestFiles(Array.from(selectedDocIds));
 
-    const examTitle = `${documents[0].display_name}${
-      documents.length > 1
-        ? ` and ${documents.length - 1} other${documents.length > 2 ? "s" : ""}`
-        : ""
-    }`;
-    const { data, error } = await supabase
-      .from("exams")
-      .insert([
-        {
-          title: examTitle,
-          user_id: currentUserId,
-          questions: questions,
-        },
-      ])
-      .select();
+    // create exam title
+    const docIds = Array.from(selectedDocIds);
+    const firstDocName = documents.find(
+      (doc) => doc.id === docIds[0]
+    ).display_name;
+    const remainingCount = docIds.length - 1;
 
-    if (error) {
-      setError(error);
-      return;
-    }
+    const suffix =
+      remainingCount > 0
+        ? ` and ${remainingCount} other${remainingCount > 1 ? "s" : ""}`
+        : "";
 
-    console.log(data[0].id);
+    const examTitle = `${firstDocName}${suffix}`;
+
     navigate("/exam", {
       state: {
-        config,
-        questions: questions,
-        examId: data[0].id,
+        questions,
+        examTitle,
       },
     });
   };
