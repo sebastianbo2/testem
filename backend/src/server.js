@@ -85,8 +85,11 @@ const sampleQuestions = [
 
 app.post("/api/files", async (req, res) => {
   const fileIds = req.body.fileIds;
+  const config = req.body.config
 
-  // const questions = await fetchQuestions(fileIds);
+  console.log("CONFIG: ", config)
+
+  // const questions = await fetchQuestions(fileIds, config);
   // console.log(questions);
 
   const output = await readFile("output.txt", "utf8");

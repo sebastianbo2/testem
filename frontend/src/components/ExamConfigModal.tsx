@@ -32,7 +32,7 @@ export const ExamConfigModal = ({
   onClose,
   onStartExam,
 }: ExamConfigModalProps) => {
-  const [numberOfQuestions, setNumberOfQuestions] = useState(10);
+  const [numberOfQuestions, setNumberOfQuestions] = useState(5);
   const [subject, setSubject] = useState('');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
 
@@ -70,14 +70,14 @@ export const ExamConfigModal = ({
             <Slider
               value={[numberOfQuestions]}
               onValueChange={([value]) => setNumberOfQuestions(value)}
-              min={5}
-              max={50}
-              step={5}
+              min={1}
+              max={20}
+              step={1}
               className="w-full"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>5</span>
-              <span>50</span>
+              <span>1</span>
+              <span>20</span>
             </div>
           </div>
 

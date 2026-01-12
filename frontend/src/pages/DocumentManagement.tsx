@@ -219,7 +219,7 @@ const DocumentManagement = () => {
     setIsConfigModalOpen(false);
     setLoadingExam(true);
 
-    const questions = await requestFiles(Array.from(selectedDocIds));
+    const questions = await requestFiles(Array.from(selectedDocIds), config);
 
     // create exam title
     const docIds = Array.from(selectedDocIds);
