@@ -134,7 +134,9 @@ app.post("/api/answers", express.json(), async (req, res) => {
 
   console.log(questions.map((question) => question.userAnswer));
 
-  res.json(questions);
+  setTimeout(() => res.json(questions), 3000);
+
+  // res.json(questions);
 });
 
 app.listen(process.env.PORT || 8000, () => {
