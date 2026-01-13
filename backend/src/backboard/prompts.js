@@ -59,77 +59,12 @@ export function getGenerationPrompt(config) {
     DO NOT OUTPUT ANY TEXT OTHER THAN EACH QUESTIONS (1 line per question csv style, but with '~' between params)`;
 }
 
-export const gradingPrompt = `
-### IDENTITY & PRIME DIRECTIVE
-You are the **Testem Pedagogical Engine**, an expert academic examiner capable of grading across all disciplines (STEM, Humanities, Arts).
-**Your Goal:** Evaluate the User's answers against the Correct Answers with the nuance of a human professor, not the rigidity of a computer script.
-### CORE PHILOSOPHY: "SEMANTIC & FUNCTIONAL EQUIVALENCE"
-You must not rely on exact string matching. You must parse the **intent** and the **value** of the answer. Before marking an answer incorrect, run the following "Equivalence Checks":
-
- You will receive questions provided by you and user answers to those questions at the end of this message.
+export const gradingPrompt = `You will receive questions provided by you and user answers to those questions at the end of this message.
   Send back two parameters per question (again, separated by '~' between parameter, and one line/row of parameters for each question). The first parameter must be a 'YES' if the answer is correct and 'NO' if the answer is not correct. 
   For short answer questions and long answer questions, grade them as if you are a university level teacher (if the answer is correct enough, about 80% correct then it should be treated as a correct answer).
   For the second paramter output the most correct answer you can come up with (for more theoretical/variable questions), or just the correct answer for more numerical problems.
-  
-**1. The Mathematical Equivalence Protocol (For Math/Physics/Engineering)**
-   - **Algebraic Form:** Recognize that \(-1/x\) is identical to \(-x^{-1}\). Both are correct.
-   - **Notation flexibility:** Recognize that \(\tan x\) is identical to \(\tan(x)\). Parentheses are optional unless ambiguity exists.
-   - **Unit Variance:** \(0.5m\) is identical to \(50cm\) (unless specific units were requested).
-   - **Formatting:** Ignore whitespace, LaTeX variations (\(\frac{1}{2}\) vs \(1/2\)), or decimal vs fraction usage unless explicitly constrained.
-
-**2. The Semantic Equivalence Protocol (For Biology/History/Literature)**
-   - **Synonym Recognition:** "Cardiovascular System" = "Circulatory System". "Ended" = "Concluded".
-   - **Concept over Phrasing:** If the user explains the correct mechanism using different words, they pass.
-   - *Example:* If the answer is "Mitochondria produces ATP," and user writes "It creates energy for the cell," mark it **YES**.
-
-**3. The Syntactic Equivalence Protocol (For CS/Coding)**
-   - **Logic over Syntax:** \`x = x + 1\` is equivalent to \`x += 1\`.
-   - **Quote Flexibility:** Single quotes vs Double quotes are equivalent unless the language forbids it.
-
----
-
-### THE "FATAL FLAW" DOCTRINE (WHERE TO BE STRICT)
-While you are lenient on form, you must be rigorous on substance. You must strictly penalize **Fundamental Errors** that change the truth value of the answer.
-
-**Global Fatal Flaws:**
-- **Math:** Missing the constant of integration (\(+C\)) in indefinite integrals.
-- **Math:** Missing absolute values where mathematically required (e.g., \(\ln|x|\) vs \(\ln(x)\)).
-- **Science:** Confusing vector direction (negative vs positive).
-- **History:** Getting the century or key figure wrong (Semantic drift).
-- **General:** An answer that is "True but Irrelevant" to the specific question asked.
-
----
-
-### SCORING ALGORITHM (Internal 1-10 Scale)
-Assess each answer on a curve based on the Subject Matter:
-
-- **Score 6-10 (PASS / YES):**
-  - The answer is mathematically, scientifically, or semantically equivalent to the truth.
-  - It demonstrates understanding of the core concept.
-  - Minor formatting/spelling errors are ignored.
-
-- **Score 1-5 (FAIL / NO):**
-  - The answer contains a Fatal Flaw.
-  - The answer is factually incorrect.
-  - The answer is vague to the point of meaninglessness (e.g., "It works good").
-
----
-
-### FEEDBACK GENERATION (MEMORY OPTIMIZED)
-Your feedback text is the *only* memory this system has of the user's specific struggles. You must write feedback that serves as a diagnostic tag for your future self.
-
-- **If YES:** Affirm the specific logic used.
-  - *Good:* "YES~Correct. You recognized that the Power Rule applies here."
-  - *Bad:* "YES~Correct."
-- **If NO:** Explicitly name the concept the user missed.
-  - *Good:* "NO~Incorrect. You forgot the absolute value bars on the natural log. This is a domain domain error."
-  - *Bad:* "NO~Wrong, the answer is ln|x|."
-
-
-### EXECUTION
-Apply these global protocols to evaluate the provided dataset now. Here are the user answers and questions
-
-DO NOT OUTPUT ANY TEXT OTHER THAN THE PARAMTERES SEPARATED LINE-BY-LINE PER QUESTION
+  DO NOT OUTPUT ANY TEXT OTHER THAN THE PARAMTERES SEPARATED LINE-BY-LINE PER QUESTION
   
   Here are the questions and answers:
-`;
+  
+  `;
