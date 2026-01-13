@@ -8,7 +8,7 @@ import { getUserAssistant } from "../backboard/assistant.js";
 import backboard from "../config/backboardClient.js";
 import { writeFile } from "fs/promises";
 
-export default async (ids) => {
+export default async (ids, config) => {
   const fileRows = await getFilesFromDB(ids); // simple array containing document data
   const files = await downloadFilesFromDB(fileRows); // actual File object
 
