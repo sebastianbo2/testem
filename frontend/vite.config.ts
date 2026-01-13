@@ -5,6 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: './', // This ensures Vite generates relative paths for all assets
   server: {
     host: "::",
     port: 8080,
