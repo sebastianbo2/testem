@@ -89,30 +89,30 @@ app.post("/api/files", async (req, res) => {
 
   console.log("CONFIG: ", config)
 
-  // const questions = await fetchQuestions(fileIds, config);
-  // console.log(questions);
+  const questions = await fetchQuestions(fileIds, config);
+  console.log(questions);
 
-  const output = await readFile("output.txt", "utf8");
+  // const output = await readFile("output.txt", "utf8");
 
-  console.log("OUTPUT:", output)
+  // console.log("OUTPUT:", output)
 
-  const lines = output.split(/\r?\n/);
-  let questions = []
+  // const lines = output.split(/\r?\n/);
+  // let questions = []
 
-  lines.forEach((line) => {
-    const params = line.split("~")
+  // lines.forEach((line) => {
+  //   const params = line.split("~")
 
-    console.log("PARAMS: ", params)
+  //   console.log("PARAMS: ", params)
 
-    const question = {
-      question: params[0],
-      type: params[1],
-      options: params[1] === "multiple-choice" ? params[2].split(",").map(option => option.trim()) : [],
-      correctAnswer: params[3]
-    }
+  //   const question = {
+  //     question: params[0],
+  //     type: params[1],
+  //     options: params[1] === "multiple-choice" ? params[2].split(",").map(option => option.trim()) : [],
+  //     correctAnswer: params[3]
+  //   }
 
-    questions.push(question)
-  })
+  //   questions.push(question)
+  // })
 
   res.json(questions);
 });
@@ -122,9 +122,9 @@ app.post("/api/answers", express.json(), async (req, res) => {
 
   console.log("The user who did this exam is", user_id)
 
-  const output = await readFile("answered.txt", "utf8") // comment this
+  // const output = await readFile("answered.txt", "utf8") // comment this
 
-  // const output = await fetchAnswers(questions, user_id); // uncomment this
+  const output = await fetchAnswers(questions, user_id); // uncomment this
 
   const lines = output.split(/\r?\n/);
 
