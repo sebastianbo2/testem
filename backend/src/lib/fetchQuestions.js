@@ -115,8 +115,6 @@ export default async (ids, config) => {
     }
   }
 
-  await writeFile("output.txt", output);
-
   const lines = output.split(/\r?\n/);
   let questions = []
 
