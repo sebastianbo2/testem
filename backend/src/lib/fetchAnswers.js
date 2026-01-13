@@ -7,10 +7,11 @@ import {
 import { getUserAssistant } from "../backboard/assistant.js";
 import backboard from "../config/backboardClient.js";
 import { writeFile } from "fs/promises";
+import { gradingPrompt } from "../backboard/prompts.js";
 
 export default async (questions, user_id) => {
   const backboardURL = `https://app.backboard.io/api`;
-
+  console.log(questions);
   // ASSISTANT
   const assistant = await getUserAssistant(user_id);
   const assistantId = assistant.data.id;
@@ -33,110 +34,43 @@ export default async (questions, user_id) => {
 
   console.log("THREAD ID: ", thread);
 
-  // const thread_resp = await backboard.addMessage(thread, {
-  //   content: "what is my name and favorite color",
-  //   llm_provider: "openai",
-  //   model_name: "gpt-4o",
-  //   stream: true,
-  // });
-
-  // for await (const chunk of thread_resp) {
-  //   if (chunk.type === "content_streaming") {
-  //     process.stdout.write(chunk.content || "");
-  //   } else if (chunk.type === "message_complete") {
-  //     break;
-  //   }
-  // }
-
-  // 4. INDEXING PHASE (The Fix)
-  // console.log("⏳ Waiting for Backboard to index files...");
-  // await Promise.all(
-  //   uploadedDocIds.map((docId) => isDocumentIndexed(docId, backboardURL))
-  // );
-
-  const msgFormData = new FormData()
-  let prompt = `You will receive questions provided by you and user answers to those questions at the end of this message.
-  Send back two parameters per question (again, separated by '~' between parameter, and one line/row of parameters for each question). The first parameter must be a 'YES' if the answer is correct and 'NO' if the answer is not correct. 
-  For short answer questions and long answer questions, grade them as if you are a university level teacher (if the answer is correct enough, about 80% correct then it should be treated as a correct answer).
-  For the second paramter output the most correct answer you can come up with (for more theoretical/variable questions), or just the correct answer for more numerical problems.
-  DO NOT OUTPUT ANY TEXT OTHER THAN THE PARAMTERES SEPARATED LINE-BY-LINE PER QUESTION
-  
-  Here are the questions and answers:
-  
-  `
+  let prompt = gradingPrompt;
 
   questions.forEach((question, index) => {
-    let line = ""
+    let line = "";
 
-    line = line + `${index + 1}. ${question.question}\nUser Answer: ${question.userAnswer}`
+    line =
+      line +
+      `${index + 1}. ${question.question}\nUser Answer: ${question.userAnswer}`;
 
-    prompt = prompt + line
-  })
+    prompt = prompt + line;
+  });
 
   // Send a message and stream the response
   const stream = await backboard.addMessage(thread, {
     content: prompt,
-    llm_provider: 'openai',
-    model_name: 'gpt-4o',
+    llm_provider: "openai",
+    model_name: "gpt-4o",
     stream: true,
-    // web_search: 'Auto'
+    // web_search: 'Auto',
+    // memory: "Auto",
   });
 
-  let output = ""
+  let output = "";
 
   // Print each chunk of content as it arrives
   for await (const chunk of stream) {
-    if (chunk.type === 'content_streaming') {
-      output = output + chunk.content
+    if (chunk.type === "content_streaming") {
+      output = output + chunk.content;
       // process.stdout.write(chunk.content || '');
-    } else if (chunk.type === 'message_complete') {
+    } else if (chunk.type === "message_complete") {
       break;
     }
   }
 
   await writeFile("answered.txt", output);
-  
-  console.log(output)
 
-//   const lines = output.split(/\r?\n/);
-
-//   lines.forEach((line) => {
-//     const params = line.split("~")
-
-//     console.log("PARAMS: ", params)
-
-//     const question = {
-//       question: params[0],
-//       type: params[1],
-//       options: params[1] === "multiple-choice" ? params[2].split(",").map(option => option.trim()) : [],
-//       correctAnswer: params[3]
-//     }
-
-//     questions.push(question)
-//   })
-  
-
-  // msgFormData.append('content', prompt)
-  // msgFormData.append('llm_provider', '')
-  // msgFormData.append('model_name', '')
-  // msgFormData.append('stream', 'false')
-  // msgFormData.append('memory', 'off')
-  // msgFormData.append('web_search', 'off')
-  // msgFormData.append('send_to_llm', 'true')
-  // msgFormData.append('metadata', '')
-
-  // const msgResponse = await fetch(`${backboardURL}/threads/${thread}/messages`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'multipart/form-data',
-  //     'X-API-Key': `${process.env.BACKBOARD_KEY}`,
-  //   },
-  //   body: msgFormData,
-  // })
-
-  // const msgJson = await msgResponse.json();
-  
-  // console.log("MESSAGE REPLY: ", msgJson)
+  console.log(output);
 
   console.log("✅ All files ready. Deleting thread...");
 

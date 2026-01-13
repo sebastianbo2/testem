@@ -95,6 +95,7 @@ const Dashboard = () => {
 
   const handleLogOut = async () => {
     try {
+      navigate("/signup");
       await logOutUser();
     } catch (err) {
       console.log(err);

@@ -85,34 +85,38 @@ const sampleQuestions = [
 
 app.post("/api/files", async (req, res) => {
   const fileIds = req.body.fileIds;
-  const config = req.body.config
+  const config = req.body.config;
 
-  console.log("CONFIG: ", config)
+  console.log("CONFIG: ", config);
 
-  // const questions = await fetchQuestions(fileIds, config);
+  const questions = await fetchQuestions(fileIds, config);
   // console.log(questions);
 
-  const output = await readFile("output.txt", "utf8");
+  // BELOW IS HARDCODED QUESTIONS
+  // const output = await readFile("output.txt", "utf8");
 
-  console.log("OUTPUT:", output)
+  // console.log("OUTPUT:", output);
 
-  const lines = output.split(/\r?\n/);
-  let questions = []
+  // const lines = output.split(/\r?\n/);
+  // let questions = [];
 
-  lines.forEach((line) => {
-    const params = line.split("~")
+  // lines.forEach((line) => {
+  //   const params = line.split("~");
 
-    console.log("PARAMS: ", params)
+  //   console.log("PARAMS: ", params);
 
-    const question = {
-      question: params[0],
-      type: params[1],
-      options: params[1] === "multiple-choice" ? params[2].split(",").map(option => option.trim()) : [],
-      correctAnswer: params[3]
-    }
+  //   const question = {
+  //     question: params[0],
+  //     type: params[1],
+  //     options:
+  //       params[1] === "multiple-choice"
+  //         ? params[2].split(",").map((option) => option.trim())
+  //         : [],
+  //     correctAnswer: params[3],
+  //   };
 
-    questions.push(question)
-  })
+  //   questions.push(question);
+  // });
 
   res.json(questions);
 });
@@ -120,20 +124,21 @@ app.post("/api/files", async (req, res) => {
 app.post("/api/answers", express.json(), async (req, res) => {
   const { user_id, questions } = req.body;
 
-  console.log("The user who did this exam is", user_id)
+  console.log("The user who did this exam is", user_id);
 
-  const output = await readFile("answered.txt", "utf8") // comment this
+  // const output = await readFile("answered.txt", "utf8"); // comment this
 
-  // const output = await fetchAnswers(questions, user_id); // uncomment this
+  const output = await fetchAnswers(questions, user_id); // uncomment this
 
   const lines = output.split(/\r?\n/);
 
   lines.forEach((line, index) => {
-    const params = line.split("~")
+    const params = line.split("~");
 
-    questions[index].isCorrect = params[0].toLowerCase().trim() === "yes" ? true : false
-    questions[index].modelAnswer = params[1].trim()
-  })
+    questions[index].isCorrect =
+      params[0].toLowerCase().trim() === "yes" ? true : false;
+    questions[index].modelAnswer = params[1].trim();
+  });
 
   console.log(questions.map((question) => question.userAnswer));
 
