@@ -17,7 +17,7 @@ import { useExamSession } from "@/hooks/useExamSession";
 
 const validateAnswers = async (questions: Question[], user: string) => {
   const response = await fetch(
-    `${import.meta.env.VITE_SERVER_URL}/api/answers`,
+    `/api/answers`,
     {
       method: "POST",
       headers: {

@@ -1,12 +1,12 @@
 import express from "express";
 import cors from "cors";
 import multer from "multer";
-import { createNewAssistant } from "./backboard/assistant.js";
-import { getRowByIdFromTable } from "./lib/db_requests.js";
-import supabase from "./config/supabaseClient.js";
-import fetchQuestions from "./lib/fetchQuestions.js";
+import { createNewAssistant } from "./src/backboard/assistant.js";
+import { getRowByIdFromTable } from "./src/lib/db_requests.js";
+import supabase from "./src/config/supabaseClient.js";
+import fetchQuestions from "./src/lib/fetchQuestions.js";
 import { readFile } from "fs/promises";
-import fetchAnswers from "./lib/fetchAnswers.js";
+import fetchAnswers from "./src/lib/fetchAnswers.js";
 
 const app = express();
 const upload = multer();
@@ -147,6 +147,8 @@ app.post("/api/answers", express.json(), async (req, res) => {
   // res.json(questions);
 });
 
-app.listen(process.env.PORT || 8000, () => {
-  console.log("Server is listening");
-});
+export default app;
+
+// app.listen(process.env.PORT || 8000, () => {
+//   console.log("Server is listening");
+// });

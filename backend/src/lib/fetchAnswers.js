@@ -68,8 +68,6 @@ export default async (questions, user_id) => {
     }
   }
 
-  await writeFile("answered.txt", output);
-
   console.log(output);
 
   console.log("✅ All files ready. Deleting thread...");

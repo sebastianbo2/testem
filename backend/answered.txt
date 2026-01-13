@@ -1,5 +1,0 @@
-NO~Incorrect. You included a fundamental error by using (-) instead of (+) before the 8cos(x). The constant of integration is correctly acknowledged.  
-NO~Incorrect. You gave a correct expression tan(x) but mismatched brackets indicate a formatting mistake. Also, ensure the full notation with constant (+C) is used.  
-NO~Incorrect. The integral is not undefined; it's computable. Ensure to apply the Power Rule correctly.  
-NO~Incorrect. The concept of the antiderivative as the indefinite integral is misrepresented as undefined; it should be the antiderivative F(x) + C.  
-NO~Incorrect. The statement is true; the property of linearity in integrals is missed here.
