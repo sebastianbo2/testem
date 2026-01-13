@@ -93,8 +93,6 @@ export default async (questions, user_id) => {
       break;
     }
   }
-
-  await writeFile("answered.txt", output);
   
   console.log(output)
 
