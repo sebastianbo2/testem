@@ -54,6 +54,7 @@ export const isDocumentIndexed = async (docId) => {
       }
     );
     const json = await res.json();
+    console.log(json);
 
     if (json.status === "indexed") return true;
     if (json.status === "failed") throw new Error(`Indexing failed for ${docId}`);
