@@ -8,6 +8,9 @@ import { getUserAssistant } from "../backboard/assistant.js";
 import backboard from "../config/backboardClient.js";
 import { writeFile } from "fs/promises";
 import { getGenerationPrompt } from "../backboard/prompts.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export default async (ids, config) => {
   const fileRows = await getFilesFromDB(ids); // simple array containing document data

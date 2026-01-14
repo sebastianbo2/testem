@@ -8,6 +8,9 @@ import { getUserAssistant } from "../backboard/assistant.js";
 import backboard from "../config/backboardClient.js";
 import { writeFile } from "fs/promises";
 import { gradingPrompt } from "../backboard/prompts.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export default async (questions, user_id) => {
   const backboardURL = `https://app.backboard.io/api`;
