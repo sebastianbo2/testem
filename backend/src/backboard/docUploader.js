@@ -1,6 +1,6 @@
-import dotenv from 'dotenv'
+import dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
 
 /**
  * Uploads a single file to backboard API
@@ -43,9 +43,10 @@ export const uploadSingleFileToBackboard = async (file, threadId) => {
  * @returns whether the document is successfully indexed. False indicates that timeout exceeded
  */
 export const isDocumentIndexed = async (docId) => {
-  const maxRetries = 10;
+  const maxRetries = 100;
 
   for (let i = 0; i < maxRetries; i++) {
+    // while (true) {
     const res = await fetch(
       `${process.env.BACKBOARD_URL}/documents/${docId}/status`,
       {
@@ -55,8 +56,7 @@ export const isDocumentIndexed = async (docId) => {
     const json = await res.json();
 
     if (json.status === "indexed") return true;
-    if (json.status === "failed")
-      throw new Error(`Indexing failed for ${docId}`);
+    if (json.status === "failed") throw new Error(`Indexing failed for ${docId}`);
 
     // Wait 1 second before trying again
     await new Promise((r) => setTimeout(r, 1000));
