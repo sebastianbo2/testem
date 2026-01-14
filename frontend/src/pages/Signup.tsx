@@ -45,14 +45,11 @@ export default function Signup() {
         // create assistant for new signed user ID
         const userId = result.data.user.id;
         try {
-          const response = await fetch(
-            `${import.meta.env.VITE_SERVER_URL}/supabase/createNewAssistant`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ user_id: userId }),
-            }
-          );
+          const response = await fetch(`/supabase/createNewAssistant`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: userId }),
+          });
 
           if (!response.ok) throw new Error("Failed to create assistant");
         } catch (err) {
@@ -106,16 +103,10 @@ export default function Signup() {
           <div className="pointer-events-none">
             <Logo />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            Sign up
-          </h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Sign up</h1>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          noValidate
-          className="flex flex-col gap-4"
-        >
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           {/* Email Field */}
           <div className="flex flex-col gap-1.5">
             <label htmlFor="email" className="text-sm font-medium leading-none">
@@ -133,9 +124,7 @@ export default function Signup() {
               }`}
             />
             {emailError && (
-              <p className="text-xs text-error font-medium">
-                {emailErrorMessage}
-              </p>
+              <p className="text-xs text-error font-medium">{emailErrorMessage}</p>
             )}
           </div>
 
