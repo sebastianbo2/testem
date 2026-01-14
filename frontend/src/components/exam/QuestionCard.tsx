@@ -116,7 +116,7 @@ export const QuestionCard = ({
             {showResults && !isCorrect && (
               <div className="text-sm">
                 <span className="text-muted-foreground">
-                  <LatexRenderer content={question.modelAnswer} />
+                  <LatexRenderer content={`Correct Answer: ${question.modelAnswer}`} />
                 </span>
                 <span className="text-success font-medium">
                   {/* <LatexRenderer content={question.correctAnswer} /> */}

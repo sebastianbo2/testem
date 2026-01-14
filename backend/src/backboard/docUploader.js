@@ -43,10 +43,9 @@ export const uploadSingleFileToBackboard = async (file, threadId) => {
  * @returns whether the document is successfully indexed. False indicates that timeout exceeded
  */
 export const isDocumentIndexed = async (docId) => {
-  const maxRetries = 100;
+  const maxRetries = 10;
 
   for (let i = 0; i < maxRetries; i++) {
-    // while (true) {
     const res = await fetch(
       `${process.env.BACKBOARD_URL}/documents/${docId}/status`,
       {
@@ -54,7 +53,6 @@ export const isDocumentIndexed = async (docId) => {
       }
     );
     const json = await res.json();
-    console.log(json);
 
     if (json.status === "indexed") return true;
     if (json.status === "error") throw new Error(`Indexing failed for ${docId}`);

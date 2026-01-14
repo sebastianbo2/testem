@@ -11,4 +11,4 @@ export default async function requestFiles(fileIds: string[], config: ExamConfig
 
   console.log(json);
   return json;
-}
+};
