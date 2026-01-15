@@ -16,7 +16,7 @@ import GradingLoading from "./loading/GradingLoading";
 import { useExamSession } from "@/hooks/useExamSession";
 
 const validateAnswers = async (questions: Question[], user: string) => {
-  const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/answers`, {
+  const response = await fetch(`/api/answers`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
