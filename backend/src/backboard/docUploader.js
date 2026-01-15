@@ -43,7 +43,7 @@ export const uploadSingleFileToBackboard = async (file, threadId) => {
  * @returns whether the document is successfully indexed. False indicates that timeout exceeded
  */
 export const isDocumentIndexed = async (docId) => {
-  const maxRetries = 10;
+  const maxRetries = 50;
 
   for (let i = 0; i < maxRetries; i++) {
     const res = await fetch(

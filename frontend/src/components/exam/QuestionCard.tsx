@@ -116,7 +116,9 @@ export const QuestionCard = ({
             {showResults && !isCorrect && (
               <div className="text-sm">
                 <span className="text-muted-foreground">
-                  <LatexRenderer content={`Correct Answer: ${question.modelAnswer}`} />
+                  <LatexRenderer
+                    content={`Correct Answer: ${question.modelAnswer}`}
+                  />
                 </span>
                 <span className="text-success font-medium">
                   {/* <LatexRenderer content={question.correctAnswer} /> */}
@@ -143,7 +145,7 @@ export const QuestionCard = ({
             {showResults && (
               <div className="mt-3 p-3 rounded-lg bg-accent/50">
                 <span className="text-sm font-medium text-muted-foreground">
-                  Model Answer:
+                  {`Model Answer: ${question.modelAnswer}`}
                 </span>
                 {/* <p className="text-sm mt-1">{question.correctAnswer}</p> */}
               </div>
@@ -172,9 +174,7 @@ export const QuestionCard = ({
   };
 
   return (
-    <div
-      className={cn("card-academic p-6 animate-fade-in", getResultClasses())}
-    >
+    <div className={cn("card-academic p-6 animate-fade-in", getResultClasses())}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-semibold">

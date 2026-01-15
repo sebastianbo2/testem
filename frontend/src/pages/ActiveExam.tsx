@@ -16,16 +16,13 @@ import GradingLoading from "./loading/GradingLoading";
 import { useExamSession } from "@/hooks/useExamSession";
 
 const validateAnswers = async (questions: Question[], user: string) => {
-  const response = await fetch(
-    `/api/answers`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ user_id: user, questions: questions }),
-    }
-  );
+  const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/answers`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ user_id: user, questions: questions }),
+  });
 
   return await response.json();
 };
@@ -38,8 +35,7 @@ const ActiveExam = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>("");
   const [isGrading, setIsGrading] = useState(false);
 
-  const { questions, setQuestions, examTitle, examId, isLoading } =
-    useExamSession();
+  const { questions, setQuestions, examTitle, examId, isLoading } = useExamSession();
 
   const { session } = useAuth();
   useEffect(() => {
@@ -74,10 +70,7 @@ const ActiveExam = () => {
       console.log("SENDING TO SERVER:", JSON.stringify(questions[0], null, 2)); // Check the first question structure
 
       // A. Grade
-      const correctedQuestions = await validateAnswers(
-        questions,
-        currentUserId
-      );
+      const correctedQuestions = await validateAnswers(questions, currentUserId);
       console.log(correctedQuestions);
 
       const totalQuestions = correctedQuestions.length;
@@ -85,9 +78,7 @@ const ActiveExam = () => {
         (q: Question) => q.isCorrect
       ).length;
       const finalScore =
-        totalQuestions > 0
-          ? Math.round((numCorrect / totalQuestions) * 100)
-          : 0;
+        totalQuestions > 0 ? Math.round((numCorrect / totalQuestions) * 100) : 0;
 
       const payload = {
         title: examTitle,
@@ -186,11 +177,7 @@ const ActiveExam = () => {
             ))}
 
             <div className="flex justify-center pt-8">
-              <Button
-                onClick={handleSubmitExam}
-                size="lg"
-                className="gap-2 px-8"
-              >
+              <Button onClick={handleSubmitExam} size="lg" className="gap-2 px-8">
                 <Send className="w-5 h-5" />
                 Submit Exam
               </Button>

@@ -31,7 +31,7 @@ export function getGenerationPrompt(config) {
   Just keep it a short question that has the answer buried in it (calculation) or in the theory of the material included in the document(s)).
   ${
     config.subject.length > 0
-      ? `The user also entered a subject/some context for the exam generation (Do not refer to this if it is not (at least somewhat) relevant to the material in the pdf, and especially if it is not relevant.
+      ? `The user also entered a subject/some context for the exam generation (Do not refer to this if it is not (at least somewhat) relevant to the material in the file content, and especially if it is not relevant.
      But if it is, prioritize this part of the document(s) content for better studying. Here is the context: ${config.subject}`
       : ""
   }

@@ -23,6 +23,7 @@ import CreateFolderBanner from "@/components/folders/CreateFolderBanner";
 import { useAuth } from "@/context/AuthContext";
 import requestFiles from "@/api/requestFiles.ts";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import mime from "mime";
 
 const DocumentManagement = () => {
   const navigate = useNavigate();
@@ -104,14 +105,21 @@ const DocumentManagement = () => {
         // unique path to avoid collisions
         const docId = crypto.randomUUID();
         const fileExt = uploadedFile.name.split(".").pop();
-        const uniqueFileName = `${uploadedFile.name}__${docId}.${fileExt}`;
+        const uniqueFileName = `${docId}.${fileExt}`;
         const storagePath = `${currentUserId}/${uniqueFileName}`;
 
         // upload "uploadedFile" to supabase "documents" bucket
-        const { data: storageData, error: storageError } =
-          await supabase.storage
-            .from("documents")
-            .upload(storagePath, uploadedFile);
+        const fileType = mime.getType(uploadedFile.name);
+        console.log(fileType);
+        const fileBody = new Blob([uploadedFile], { type: fileType });
+
+        const { data: storageData, error: storageError } = await supabase.storage
+          .from("documents")
+          .upload(storagePath, fileBody, {
+            // Use the new fileBody
+            contentType: fileType,
+            upsert: false,
+          });
 
         if (storageError) {
           setError(storageError);
@@ -177,10 +185,9 @@ const DocumentManagement = () => {
     const deleteFromDB = async () => {
       try {
         // 1. Delete the physical file from the Storage Bucket
-        const { data: storageData, error: storageError } =
-          await supabase.storage
-            .from("documents")
-            .remove([document.storage_path]); // .remove() expects an array of paths
+        const { data: storageData, error: storageError } = await supabase.storage
+          .from("documents")
+          .remove([document.storage_path]); // .remove() expects an array of paths
 
         if (storageError) {
           console.error("Storage deletion failed:", storageError.message);
@@ -223,9 +230,7 @@ const DocumentManagement = () => {
 
     // create exam title
     const docIds = Array.from(selectedDocIds);
-    const firstDocName = documents.find(
-      (doc) => doc.id === docIds[0]
-    ).display_name;
+    const firstDocName = documents.find((doc) => doc.id === docIds[0]).display_name;
     const remainingCount = docIds.length - 1;
 
     const suffix =
