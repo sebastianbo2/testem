@@ -1,57 +1,84 @@
 # Testem
 
-**Testem** is a web application that helps you *turn your own notes and documents into practice exams*. Upload files containing STEM (Science, Technology, Engineering, Mathematics) content and instantly generate randomized practice questions to study, review, or test your knowledge.
+**Testem** is an AI-powered exam generator designed for STEM students. It transforms personal study materials into structured, interactive practice exams, with a focus on clarity, feedback, and mathematical correctness.
 
-> ⚡ Built to make learning and revision easier — upload content, generate exam-style questions, and quiz yourself or others.
-
----
-
-## 🚀 Features
-
-- 📤 **File Upload:** Upload text-based documents (PDF, TXT, DOCX, etc.) with STEM content.
-- 🧠 **Content Parsing:** Automatically processes the uploaded files and extracts key information.
-- 📝 **Practice Exam Generation:** Creates customizable practice tests based on the content.
-- 🎯 **STEM Focused:** Designed with STEM subjects in mind — math, physics, chemistry, biology, and engineering.
-- 🔄 **Randomized Questions:** Generate new sets of questions each time for more effective studying.
-- 💡 **Easy to Use UI:** Intuitive web interface for uploading files and generating exams.
-- 📦 **Frontend + Backend:** Full stack TypeScript/JavaScript project ready for deployment.
+[Live demo](https://testem-app.vercel.app/)
 
 ---
 
-## 📁 Getting Started
+## Overview
 
-### Prerequisites
-
-Before you begin, ensure you have the following installed:
-
-- Node.js (v14+)
-- npm or yarn
+Ever had a teacher who doesn't give enough practice exam material? Studying in STEM often breaks down when students lack structured feedback and realistic practice. Testem addresses this by allowing users to upload documents, generate exams tailored to difficulty and context, complete them in a distraction-free environment, and receive clear, graded feedback.
 
 ---
 
-## 🛠 Installation
+## Core Features
 
-1. **Clone the repository**
+### Dashboard
+- Overview of the user’s workspace
+- Document Library and Exam History entry points
+- Exam History displays past attempts with semantic score indicators
+
+### Document Management
+- Folder-based sidebar for organization
+- Upload, delete, and rearrange documents (PDF/TXT)
+- Checkbox-based document selection
+- Context-aware floating action bar for exam generation
+
+### Exam Configuration
+- Modal-based configuration flow
+- Adjustable number of questions (5–50)
+- Subject context input
+- Difficulty selection (Easy, Medium, Hard)
+- Loading state simulating AI parsing
+
+### Active Exam Experience
+- Sticky sidebar with question navigation
+- Support for multiple question types:
+  - Multiple Choice
+  - True / False
+  - Short Answer
+  - Long Answer
+  - Math / STEM questions rendered using LaTeX
+- CSV-based question parsing to simulate backend responses
+- Responsive, scroll-friendly layout
+
+### Results & Feedback
+- Per-question feedback with clear visual distinction
+- Comparison between user answers and correct answers
+- Return-to-dashboard flow
+
+### Exam History
+- Full history table with sorting
+- Sortable by:
+  - Grade
+  - Completion date
+  - Number of questions
+- Ascending and descending order support
+- Summary statistics for quick insight
+
+---
+
+## Tech Stack
+- Express
+- Supabase
+- Backboard.io for AI integration
+
+- React (Vite)
+- Tailwind CSS
+- shadcn/ui (Radix UI-based components)
+- Lucide React (icons)
+- KaTeX / react-latex-next for mathematical rendering
+- PapaParse for CSV parsing
+- Framer Motion (onboarding animations)
+
+---
+
+## Running the Project Locally
 
 ```bash
-git clone https://github.com/sebastianbo2/testem.git
-```
-
-2. **Install dependencies**
-
-```bash
+git clone https://github.com/your-username/testem.git
 cd testem
 npm install
-# or
-yarn install
-```
-
-3. **Run locally**
-
-```bash
 npm run dev
-# or
-yarn dev
 ```
-
-By default, the app will run on http://localhost:3000 (or whatever is configured).
